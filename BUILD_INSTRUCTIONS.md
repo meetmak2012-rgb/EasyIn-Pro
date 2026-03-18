@@ -35,7 +35,22 @@ This will generate a `dist` folder containing the static files that can be deplo
 
 ---
 
-## 📂 3. Project Structure
+## ☁️ 3. Deploy to Cloudflare Pages
+
+To deploy your application to Cloudflare Pages:
+
+1.  **Connect your Repository**: Connect your GitHub/GitLab repository to Cloudflare Pages.
+2.  **Build Settings**:
+    *   **Framework Preset**: `Vite`
+    *   **Build Command**: `npm run build`
+    *   **Build Output Directory**: `dist`
+3.  **Environment Variables**: Add any necessary environment variables (e.g., `VITE_API_URL`) in the Cloudflare dashboard.
+
+The project includes a `public/_redirects` file to handle Single Page Application (SPA) routing.
+
+---
+
+## 📂 4. Project Structure
 - `index.html`: The entry point.
 - `src/index.tsx`: The logic that starts React.
 - `src/App.tsx`: The main application code.

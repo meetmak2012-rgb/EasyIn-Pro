@@ -8,7 +8,8 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "wrangler pages deploy dist"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -22,7 +23,8 @@
     "globals": "^17.4.0",
     "typescript": "^5.7.0",
     "typescript-eslint": "^8.56.1",
-    "vite": "^5.0.0"
+    "vite": "^5.0.0",
+    "wrangler": "^4.75.0"
   },
   "dependencies": {
     "@azure/msal-browser": "^5.5.0",
