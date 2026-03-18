@@ -4,7 +4,7 @@ import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
-  base: '/',
+  base: process.env.ELECTRON === 'true' ? './' : '/',
   plugins: [
     react({
       fastRefresh: false,

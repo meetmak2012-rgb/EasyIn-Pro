@@ -11,7 +11,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "start": "electron .",
-    "build:windows": "vite build && electron-builder --win",
+    "build:windows": "cross-env ELECTRON=true vite build && electron-builder --win",
     "clean": "rd /s /q dist"
   },
   "build": {
@@ -19,8 +19,7 @@
     "productName": "EasyIn Invoicing",
     "copyright": "Copyright © 2024 EasyIn",
     "win": {
-      "target": "nsis",
-      "icon": "https://cdn-icons-png.flaticon.com/512/1055/1055644.png"
+      "target": "nsis"
     },
     "nsis": {
       "oneClick": false,
@@ -62,6 +61,7 @@
     "@tailwindcss/vite": "^4.2.1",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
+    "cross-env": "^10.1.0",
     "jspdf": "^4.2.0",
     "jspdf-autotable": "^5.0.7",
     "lucide-react": "^0.577.0",
