@@ -138,7 +138,7 @@ export const DataManagement: React.FC<DataManagementProps> = ({ transactions, on
              <div className="space-y-2 text-center md:text-left">
                 <h4 className="text-lg font-black uppercase tracking-tight">Local-First Security</h4>
                 <p className="text-slate-400 text-sm leading-relaxed">
-                   Your business records are stored strictly in your browser's private database. 
+                   Your business records are stored strictly in your browser&apos;s private database. 
                    We do not store your data on any central servers. Our <b>Auto-Backup</b> feature 
                    maintains a recovery snapshot, but you should still perform manual exports regularly.
                 </p>

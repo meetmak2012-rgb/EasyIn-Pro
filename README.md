@@ -1,20 +1,74 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# EasyIn Pro - Professional Invoicing & Inventory
 
-# Run and deploy your AI Studio app
+EasyIn Pro is a high-performance, local-first invoicing and inventory management application designed for small businesses. It features AI-powered business advisory, unit conversion tools, and cloud-based backup/restore via Google Drive and Microsoft OneDrive.
 
-This contains everything you need to run your app locally.
+## 🚀 Deployment Guide (Option 3: Manual Hosting)
 
-View your app in AI Studio: https://ai.studio/apps/22d8ef80-7f3c-416b-899e-c899c15e0817
+This app is a static Single Page Application (SPA) built with React, Vite, and Tailwind CSS. It can be hosted on any static site hosting provider.
 
-## Run Locally
+### 1. Prerequisites
+- [Node.js](https://nodejs.org/) (v18 or higher)
+- [npm](https://www.npmjs.com/)
 
-**Prerequisites:**  Node.js
+### 2. Local Setup
+```bash
+# Install dependencies
+npm install
 
+# Create a .env file based on .env.example
+cp .env.example .env
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+# Run development server
+npm run dev
+```
+
+### 3. Build for Production
+```bash
+# Generate static files in the /dist folder
+npm run build
+```
+
+### 4. Hosting Options
+
+#### Vercel / Netlify (Recommended)
+1.  **Export to GitHub**: Use the AI Studio "Export to GitHub" feature.
+2.  **Connect to Vercel/Netlify**: Link your GitHub repository.
+3.  **Build Settings**:
+    -   **Build Command**: `npm run build`
+    -   **Output Directory**: `dist`
+4.  **Environment Variables**: Set the following in your hosting provider's dashboard:
+    -   `VITE_GOOGLE_CLIENT_ID`: Your Google OAuth Client ID.
+    -   `VITE_ONEDRIVE_CLIENT_ID`: Your Microsoft Azure Client ID.
+
+### 5. Build for Windows (.exe)
+This project is pre-configured with **Electron** to generate a standalone Windows application.
+
+```bash
+# 1. Install dependencies
+npm install
+
+# 2. Build the Vite app and package it into an .exe
+npm run build:windows
+```
+The generated `.exe` installer will be located in the `dist/` folder.
+
+## ☁️ Cloud Configuration
+
+### Google Drive Sync
+- **Authorized JavaScript Origins**: Add your production URL (e.g., `https://your-app.vercel.app`).
+- **Scopes**: `https://www.googleapis.com/auth/drive.file`
+
+### Microsoft OneDrive Sync
+- **Redirect URIs**: Add your production URL as a **Single-page application (SPA)**.
+- **Scopes**: `Files.ReadWrite`, `User.Read`
+
+## 🛠 Tech Stack
+- **Frontend**: React 19, Vite, Tailwind CSS 4
+- **Icons**: Lucide React
+- **Charts**: Recharts
+- **PDF Generation**: jsPDF, jsPDF-AutoTable
+- **AI**: Google Gemini (via @google/genai)
+- **Cloud Sync**: Google Drive API, Microsoft Graph API (MSAL)
+
+---
+*Built with Google AI Studio Build*

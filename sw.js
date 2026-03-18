@@ -4,14 +4,8 @@ const ASSETS = [
   './',
   './index.html',
   './manifest.json',
-  'https://cdn.tailwindcss.com',
+  '/src/index.css',
   'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap',
-  // Note: Most browser security policies allow caching external modules via SW
-  'https://aistudiocdn.com/react@^19.2.1',
-  'https://aistudiocdn.com/react-dom@^19.2.1',
-  'https://aistudiocdn.com/lucide-react@^0.555.0',
-  'https://esm.sh/jspdf@2.5.1',
-  'https://esm.sh/jspdf-autotable@3.8.2'
 ];
 
 self.addEventListener('install', (event) => {

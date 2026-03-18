@@ -29,6 +29,8 @@ export interface BusinessProfile {
   minSqFtPerPiece: number;
   minItemAmount: number;
   lastCloudSync?: string;
+  googleClientId?: string;
+  oneDriveClientId?: string;
 }
 
 export interface Transaction {

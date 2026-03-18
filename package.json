@@ -1,4 +1,3 @@
-
 {
   "name": "easyin-invoicing",
   "version": "1.0.0",
@@ -8,8 +7,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
     "start": "electron .",
-    "build": "electron-builder --win",
+    "build:windows": "vite build && electron-builder --win",
     "clean": "rd /s /q dist"
   },
   "build": {
@@ -32,17 +34,40 @@
       "output": "dist"
     },
     "files": [
-      "**/*",
-      "!dist/*",
-      "!node_modules/*",
-      "!.github/*",
-      "!.git/*"
+      "dist/**/*",
+      "main.js",
+      "preload.js",
+      "package.json"
     ]
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^25.3.5",
+    "@typescript-eslint/eslint-plugin": "^8.56.1",
+    "@typescript-eslint/parser": "^8.56.1",
+    "@vitejs/plugin-react": "^4.2.0",
     "electron": "^31.0.0",
     "electron-builder": "^24.13.3",
-    "vite": "^5.0.0",
-    "@vitejs/plugin-react": "^4.2.0"
+    "eslint": "^9.39.3",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.5.2",
+    "globals": "^17.4.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.56.1",
+    "vite": "^5.0.0"
+  },
+  "dependencies": {
+    "@azure/msal-browser": "^5.5.0",
+    "@google/genai": "^1.44.0",
+    "@tailwindcss/vite": "^4.2.1",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "jspdf": "^4.2.0",
+    "jspdf-autotable": "^5.0.7",
+    "lucide-react": "^0.577.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "recharts": "^3.7.0",
+    "tailwindcss": "^4.2.1"
   }
 }

@@ -179,7 +179,7 @@ export const UnitConverter: React.FC = () => {
                 <tr className="hover:bg-slate-50 transition-colors">
                   <td className="px-6 py-4 font-medium text-slate-700">Inch to Feet</td>
                   <td className="px-6 py-4 text-slate-500">Divide by 12</td>
-                  <td className="px-6 py-4 text-right font-mono text-xs">12" = 1 ft</td>
+                  <td className="px-6 py-4 text-right font-mono text-xs">12&quot; = 1 ft</td>
                 </tr>
                 <tr className="hover:bg-slate-50 transition-colors">
                   <td className="px-6 py-4 font-medium text-slate-700">Sq. Inch to Sq. Feet</td>
