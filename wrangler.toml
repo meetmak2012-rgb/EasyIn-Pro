@@ -1,4 +1,4 @@
-name = "easyin-invoicing"
+name = "easyin-pro"
 pages_build_output_dir = "dist"
 
 [vars]
