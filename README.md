@@ -30,27 +30,29 @@ npm run build
 
 ### 4. Hosting Options
 
-#### Vercel / Netlify (Recommended)
+#### Netlify (Recommended)
 1.  **Export to GitHub**: Use the AI Studio "Export to GitHub" feature.
-2.  **Connect to Vercel/Netlify**: Link your GitHub repository.
+2.  **Connect to Netlify**: Link your GitHub repository.
 3.  **Build Settings**:
     -   **Build Command**: `npm run build`
-    -   **Output Directory**: `dist`
-4.  **Environment Variables**: Set the following in your hosting provider's dashboard:
+    -   **Publish Directory**: `dist`
+4.  **Environment Variables**: Set the following in your Netlify dashboard:
     -   `VITE_GOOGLE_CLIENT_ID`: Your Google OAuth Client ID.
     -   `VITE_ONEDRIVE_CLIENT_ID`: Your Microsoft Azure Client ID.
+    -   `GEMINI_API_KEY`: Your Google Gemini API key.
 
-### 5. Build for Windows (.exe)
-This project is pre-configured with **Electron** to generate a standalone Windows application.
-
+### 5. Deployment via CLI
+You can also deploy directly from your terminal using the Netlify CLI:
 ```bash
-# 1. Install dependencies
-npm install
+# 1. Install Netlify CLI (if not already installed)
+npm install -g netlify-cli
 
-# 2. Build the Vite app and package it into an .exe
-npm run build:windows
+# 2. Build the app
+npm run build
+
+# 3. Deploy to production
+npm run deploy
 ```
-The generated `.exe` installer will be located in the `dist/` folder.
 
 ## ☁️ Cloud Configuration
 

@@ -1,6 +1,0 @@
-name = "easyin-invoicing"
-pages_build_output_dir = "dist"
-
-[vars]
-# Add your environment variables here
-# VITE_API_URL = "https://api.example.com"
