@@ -7,7 +7,7 @@ import { TransactionForm } from './components/TransactionForm';
 import { Reports } from './components/Reports';
 import { DataManagement } from './components/DataManagement';
 import { Settings } from './components/Settings';
-import { UnitConverter } from './components/UnitConverter';
+import { UnitConverter } from './components/UnitConverter.tsx';
 import { AiAdvisor } from './components/AiAdvisor';
 import { VideoTutorial } from './components/VideoTutorial';
 import { Auth } from './components/Auth';
