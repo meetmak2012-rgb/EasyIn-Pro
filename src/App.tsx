@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Layout } from './components/Layout';
 import { Dashboard } from './components/Dashboard';
 import { TransactionList } from './components/TransactionList';
-import { TransactionForm } from './components/TransactionForm.tsx';
+import { TransactionForm } from './components/TransactionForm';
 import { Reports } from './components/Reports';
 import { DataManagement } from './components/DataManagement';
 import { Settings } from './components/Settings';

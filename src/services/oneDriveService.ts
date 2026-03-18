@@ -17,7 +17,6 @@ export const initMsal = async (clientId: string) => {
     },
     cache: {
       cacheLocation: "localStorage",
-      storeAuthStateInCookie: false,
     },
   };
 
