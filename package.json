@@ -2,42 +2,13 @@
   "name": "easyin-invoicing",
   "version": "1.0.0",
   "description": "Professional Invoicing and Inventory Management",
-  "main": "main.cjs",
   "author": "EasyIn Labs",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview",
-    "start": "electron .",
-    "build:windows": "cross-env ELECTRON=true vite build && electron-builder --win",
-    "clean": "rd /s /q dist"
-  },
-  "build": {
-    "appId": "com.easyin.app",
-    "productName": "EasyIn Invoicing",
-    "copyright": "Copyright © 2024 EasyIn",
-    "win": {
-      "target": "nsis"
-    },
-    "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true,
-      "createDesktopShortcut": true,
-      "createStartMenuShortcut": true,
-      "shortcutName": "EasyIn Invoicing",
-      "runAfterFinish": true
-    },
-    "directories": {
-      "output": "dist"
-    },
-    "files": [
-      "dist/**/*",
-      "main.cjs",
-      "preload.cjs",
-      "package.json"
-    ]
+    "preview": "vite preview"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -45,8 +16,6 @@
     "@typescript-eslint/eslint-plugin": "^8.56.1",
     "@typescript-eslint/parser": "^8.56.1",
     "@vitejs/plugin-react": "^4.2.0",
-    "electron": "^31.0.0",
-    "electron-builder": "^24.13.3",
     "eslint": "^10.0.3",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.5.2",

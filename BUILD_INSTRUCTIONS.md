@@ -1,11 +1,11 @@
 
 # 🚀 EasyIn Setup & Node.js Commands
 
-If you are seeing a **blank screen**, it's because the computer needs to "translate" the React code (TSX) into plain JavaScript.
+This is a React-based web application for professional invoicing and inventory management.
 
 ---
 
-## 💻 1. How to Run Locally (Node.js)
+## 💻 1. How to Run Locally
 
 Open your terminal in this project folder and run these commands in order:
 
@@ -19,40 +19,25 @@ npm install
 
 ### Step C: Run the Application
 ```bash
-npm start
+npm run dev
 ```
+This will start the development server. Open the link (usually `http://localhost:3000`) in your browser.
 
 ---
 
-## 🛠️ 2. Fixing the "Blank Screen" (Vite Method)
+## 📦 2. Build for Production
 
-For the best experience and to ensure the code renders correctly on your PC, we recommend using **Vite**.
-
-1.  **Install Vite**:
-    ```bash
-    npm install -g vite
-    ```
-2.  **Run Development Server**:
-    ```bash
-    vite
-    ```
-3.  **Open the Link**: It will give you a link like `http://localhost:5173`. Open this in your browser.
-
----
-
-## 📦 3. Create Windows Installer (.exe)
-
-Once you are ready to use it as a real desktop app:
+To create a production-ready build:
 ```bash
 npm run build
 ```
-This will generate a `dist` folder containing `EasyIn Invoicing Setup.exe`.
+This will generate a `dist` folder containing the static files that can be deployed to any web host (Vercel, Netlify, etc.).
 
 ---
 
-## 📂 4. Project Structure
+## 📂 3. Project Structure
 - `index.html`: The entry point.
-- `index.tsx`: The logic that starts React.
-- `App.tsx`: The main application code.
-- `main.js`: Tells Electron how to open the window.
+- `src/index.tsx`: The logic that starts React.
+- `src/App.tsx`: The main application code.
 - `package.json`: Contains the commands and library list.
+- `vite.config.ts`: Vite configuration.
