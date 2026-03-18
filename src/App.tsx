@@ -1,16 +1,16 @@
 
 import React, { useState, useEffect } from 'react';
-import { Layout } from './components/Layout';
-import { Dashboard } from './components/Dashboard';
-import { TransactionList } from './components/TransactionList';
-import { TransactionForm } from './components/TransactionForm';
-import { Reports } from './components/Reports';
-import { DataManagement } from './components/DataManagement';
-import { Settings } from './components/Settings';
-import { UnitConverter } from './components/UnitConverter';
-import { AiAdvisor } from './components/AiAdvisor';
-import { VideoTutorial } from './components/VideoTutorial';
-import { Auth } from './components/Auth';
+import { Layout } from './components/Layout.tsx';
+import { Dashboard } from './components/Dashboard.tsx';
+import { TransactionList } from './components/TransactionList.tsx';
+import { TransactionForm } from './components/TransactionForm.tsx';
+import { Reports } from './components/Reports.tsx';
+import { DataManagement } from './components/DataManagement.tsx';
+import { Settings } from './components/Settings.tsx';
+import { UnitConverter } from './components/UnitConverter.tsx';
+import { AiAdvisor } from './components/AiAdvisor.tsx';
+import { VideoTutorial } from './components/VideoTutorial.tsx';
+import { Auth } from './components/Auth.tsx';
 import { Transaction, BusinessProfile, TransactionType, User } from './types';
 
 const DEFAULT_MATERIALS = [

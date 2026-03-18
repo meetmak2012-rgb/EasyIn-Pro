@@ -2,8 +2,8 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Download, Upload, ShieldCheck, History, RefreshCcw, Cloud, CloudOff } from 'lucide-react';
 import { Transaction, BusinessProfile } from '../types';
-import { syncToDrive, restoreFromDrive, initGapi } from '../services/googleDriveService';
-import { syncToOneDrive, restoreFromOneDrive } from '../services/oneDriveService';
+import { syncToDrive, restoreFromDrive, initGapi } from '../services/googleDriveService.ts';
+import { syncToOneDrive, restoreFromOneDrive } from '../services/oneDriveService.ts';
 
 interface DataManagementProps {
   transactions: Transaction[];
