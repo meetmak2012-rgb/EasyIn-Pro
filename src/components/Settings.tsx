@@ -1,8 +1,8 @@
 
 import React, { useState } from 'react';
 import { 
-  FileCheck, Save, Sparkles, 
-  RefreshCcw, Layers, Trash2, Plus, FileText, ToggleLeft, ToggleRight, Palette, ShieldAlert, Building2
+  FileCheck, 
+  Layers, Trash2, Plus, FileText, ToggleLeft, ToggleRight, Palette, ShieldAlert, Building2
 } from 'lucide-react';
 import { BusinessProfile } from '../types';
 

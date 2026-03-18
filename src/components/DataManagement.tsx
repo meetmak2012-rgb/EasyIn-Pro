@@ -1,9 +1,9 @@
 
 import React, { useRef, useState, useEffect } from 'react';
-import { Download, Upload, ShieldCheck, History, RefreshCcw, Cloud, CloudOff } from 'lucide-react';
+import { Download, Upload, ShieldCheck, History, RefreshCcw, Cloud } from 'lucide-react';
 import { Transaction, BusinessProfile } from '../types';
-import { syncToDrive, restoreFromDrive, initGapi } from '../services/googleDriveService.ts';
-import { syncToOneDrive, restoreFromOneDrive } from '../services/oneDriveService.ts';
+import { syncToDrive, restoreFromDrive, initGapi } from '../services/googleDriveService';
+import { syncToOneDrive, restoreFromOneDrive } from '../services/oneDriveService';
 
 interface DataManagementProps {
   transactions: Transaction[];
@@ -16,7 +16,6 @@ export const DataManagement: React.FC<DataManagementProps> = ({ transactions, on
   const [lastAutoBackup, setLastAutoBackup] = useState<string | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
   const [isOneDriveSyncing, setIsOneDriveSyncing] = useState(false);
-  const [syncStatus, setSyncStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
   useEffect(() => {
     const last = localStorage.getItem('easyin_last_autobackup');
@@ -45,13 +44,10 @@ export const DataManagement: React.FC<DataManagementProps> = ({ transactions, on
     }
 
     setIsSyncing(true);
-    setSyncStatus('idle');
     try {
       await syncToDrive(transactions, profile.googleClientId);
-      setSyncStatus('success');
       alert('Data synced to Google Drive successfully!');
-    } catch (error) {
-      setSyncStatus('error');
+    } catch {
       alert('Failed to sync to Google Drive. Check console for details.');
     } finally {
       setIsSyncing(false);
@@ -75,7 +71,7 @@ export const DataManagement: React.FC<DataManagementProps> = ({ transactions, on
       } else {
         alert('No backup found on Google Drive.');
       }
-    } catch (error) {
+    } catch {
       alert('Failed to restore from Google Drive.');
     } finally {
       setIsSyncing(false);
@@ -92,7 +88,7 @@ export const DataManagement: React.FC<DataManagementProps> = ({ transactions, on
     try {
       await syncToOneDrive(transactions, profile.oneDriveClientId);
       alert('Data synced to OneDrive successfully!');
-    } catch (error) {
+    } catch {
       alert('Failed to sync to OneDrive. Check console for details.');
     } finally {
       setIsOneDriveSyncing(false);
@@ -116,7 +112,7 @@ export const DataManagement: React.FC<DataManagementProps> = ({ transactions, on
       } else {
         alert('No backup found on OneDrive.');
       }
-    } catch (error) {
+    } catch {
       alert('Failed to restore from OneDrive.');
     } finally {
       setIsOneDriveSyncing(false);
@@ -135,7 +131,7 @@ export const DataManagement: React.FC<DataManagementProps> = ({ transactions, on
         const data = JSON.parse(backup);
         onImport(data);
         alert('Data restored from snapshot successfully!');
-      } catch (e) {
+      } catch {
         alert('Snapshot corrupted.');
       }
     }
@@ -157,7 +153,7 @@ export const DataManagement: React.FC<DataManagementProps> = ({ transactions, on
         } else {
             alert('Invalid backup file format.');
         }
-      } catch (err) {
+      } catch {
         alert('Failed to parse backup file.');
       }
     };

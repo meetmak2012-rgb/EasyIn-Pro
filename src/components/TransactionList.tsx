@@ -4,8 +4,8 @@ import {
   Plus, Search, Filter, FileText, Download, Edit, Trash2, ClipboardCheck, XCircle, CheckCircle2, Clock, Tag
 } from 'lucide-react';
 import { Transaction, BusinessProfile } from '../types';
-import { generateInvoicePDF } from '../utils/pdfGenerator.ts';
-import { exportTransactionsToCSV, copyTransactionsToClipboard } from '../utils/csvExporter.ts';
+import { generateInvoicePDF } from '../utils/pdfGenerator';
+import { exportTransactionsToCSV, copyTransactionsToClipboard } from '../utils/csvExporter';
 
 interface TransactionListProps {
   transactions: Transaction[];
@@ -39,7 +39,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({ transactions, 
 
   const handleDownload = async (e: React.MouseEvent, t: Transaction) => {
     e.stopPropagation();
-    try { await generateInvoicePDF(t, profile); } catch (e) { alert("Failed to generate PDF."); }
+    try { await generateInvoicePDF(t, profile); } catch { alert("Failed to generate PDF."); }
   };
 
   return (

@@ -1,8 +1,8 @@
 
 import React, { useMemo } from 'react';
 import { Transaction, TransactionType } from '../types';
-import { IndianRupee, Download, ClipboardList, CheckCircle, TrendingUp } from 'lucide-react';
-import { exportTransactionsToCSV } from '../utils/csvExporter.ts';
+import { IndianRupee, Download, ClipboardList, CheckCircle } from 'lucide-react';
+import { exportTransactionsToCSV } from '../utils/csvExporter';
 
 interface ReportsProps {
   transactions: Transaction[];

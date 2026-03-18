@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Plus, Trash2, ArrowLeft, Eye, EyeOff, Save, Tag } from 'lucide-react';
 import { LineItem, Transaction, TransactionType, BusinessProfile } from '../types';
-import { InvoicePreview } from './InvoicePreview.tsx';
+import { InvoicePreview } from './InvoicePreview';
 
 interface TransactionFormProps {
   onSave: (transaction: Transaction) => void;

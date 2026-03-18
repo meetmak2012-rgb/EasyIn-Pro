@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Send, Bot, Sparkles, Loader2, WifiOff } from 'lucide-react';
 import { Transaction } from '../types';
-import { generateBusinessInsight } from '../services/geminiService.ts';
+import { generateBusinessInsight } from '../services/geminiService';
 
 interface AiAdvisorProps {
   transactions: Transaction[];
@@ -38,7 +38,7 @@ export const AiAdvisor: React.FC<AiAdvisorProps> = ({ transactions }) => {
     try {
       const response = await generateBusinessInsight(transactions, userMsg);
       setMessages(prev => [...prev, { role: 'ai', content: response }]);
-    } catch (e) {
+    } catch {
       setMessages(prev => [...prev, { role: 'ai', content: "Connectivity issue. Please check your internet for AI features." }]);
     } finally {
       setIsLoading(false);

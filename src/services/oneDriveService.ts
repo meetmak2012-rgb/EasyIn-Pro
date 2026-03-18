@@ -40,7 +40,7 @@ export const getOneDriveToken = async (clientId: string) => {
         account: accounts[0],
       });
       return result.accessToken;
-    } catch (error) {
+    } catch {
       const result: AuthenticationResult = await instance.acquireTokenPopup(loginRequest);
       return result.accessToken;
     }
