@@ -1,4 +1,4 @@
-name = "# wrangler.toml
+
 name = 'easyinpro'
 pages_build_output_dir = "dist"
 
