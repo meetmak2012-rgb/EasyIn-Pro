@@ -9,8 +9,7 @@ import {
   Settings as SettingsIcon,
   ChevronRight,
   ClipboardList,
-  Sparkles,
-  PlayCircle
+  Sparkles
 } from 'lucide-react';
 
 interface LayoutProps {
@@ -30,7 +29,6 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeTab, onNavigate,
     { id: 'ai', label: 'AI Advisor', icon: <Sparkles size={18} /> },
     { id: 'converter', label: 'Unit Converter', icon: <Ruler size={18} /> },
     { id: 'data', label: 'Backup & Restore', icon: <Database size={18} /> },
-    { id: 'tutorial', label: 'Tutorial', icon: <PlayCircle size={18} /> },
     { id: 'settings', label: 'Settings', icon: <SettingsIcon size={18} /> },
   ];
 

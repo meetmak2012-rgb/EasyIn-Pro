@@ -9,7 +9,6 @@ import { DataManagement } from './components/DataManagement';
 import { Settings } from './components/Settings';
 import { UnitConverter } from './components/UnitConverter';
 import { AiAdvisor } from './components/AiAdvisor';
-import { VideoTutorial } from './components/VideoTutorial';
 import { Auth } from './components/Auth';
 import { Transaction, BusinessProfile, TransactionType, User } from './types';
 
@@ -45,7 +44,10 @@ const App: React.FC = () => {
 
   useEffect(() => {
     const savedUser = localStorage.getItem('easyin_current_user');
-    if (savedUser) setUser(JSON.parse(savedUser));
+    if (savedUser) {
+        const parsedUser = JSON.parse(savedUser);
+        setUser({ ...parsedUser, password: parsedUser.password || '' });
+    }
 
     const savedTxns = localStorage.getItem('easyin_transactions_v2');
     if (savedTxns) setTransactions(JSON.parse(savedTxns));
@@ -133,8 +135,31 @@ const App: React.FC = () => {
       case 'ai': return <AiAdvisor transactions={transactions} />;
       case 'converter': return <UnitConverter />;
       case 'data': return <DataManagement transactions={transactions} onImport={setTransactions} profile={businessProfile} />;
-      case 'tutorial': return <VideoTutorial />;
-      case 'settings': return <Settings profile={businessProfile} onUpdate={setBusinessProfile} />;
+      case 'settings': return <Settings 
+        profile={businessProfile} 
+        user={user!} 
+        onUpdate={setBusinessProfile} 
+        onUpdateUser={(updatedUser) => {
+            console.log('Updating user:', updatedUser);
+            const storedUsers: User[] = JSON.parse(localStorage.getItem('easyin_users') || '[]');
+            if (storedUsers.some(u => u.username === updatedUser.username && u.id !== updatedUser.id)) {
+                alert('Username is already taken');
+                return;
+            }
+            setUser(updatedUser);
+            setBusinessProfile(prev => ({ ...prev, businessName: updatedUser.businessName }));
+            const updatedUsers = storedUsers.map(u => u.id === updatedUser.id ? updatedUser : u);
+            console.log('Updated users array:', updatedUsers);
+            localStorage.setItem('easyin_users', JSON.stringify(updatedUsers));
+        }}
+        onLogout={() => setUser(null)}
+        onDeleteAccount={() => {
+            setUser(null);
+            setTransactions([]);
+            setBusinessProfile(DEFAULT_PROFILE);
+            localStorage.clear();
+        }}
+      />;
       default: return <Dashboard transactions={transactions} onAddInvoice={() => { setActiveTab('sales'); setViewState('form'); }} />;
     }
   };

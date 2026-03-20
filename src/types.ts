@@ -49,7 +49,7 @@ export interface Transaction {
 export interface User {
   id: string;
   username: string;
-  password?: string;
+  password: string;
   businessName: string;
   createdAt: string;
 }

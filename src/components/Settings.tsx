@@ -1,14 +1,19 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   FileCheck, 
-  Layers, Trash2, Plus, FileText, ToggleLeft, ToggleRight, Palette, ShieldAlert, Building2
+  Layers, Trash2, Plus, FileText, ToggleLeft, ToggleRight, Palette, ShieldAlert, Building2, Eye, EyeOff
 } from 'lucide-react';
-import { BusinessProfile } from '../types';
+import { User, BusinessProfile } from '../types';
+import { ConfirmationModal } from './ConfirmationModal';
 
 interface SettingsProps {
   profile: BusinessProfile;
+  user: User;
   onUpdate: (updated: BusinessProfile) => void;
+  onUpdateUser: (updated: User) => void;
+  onLogout: () => void;
+  onDeleteAccount: () => void;
 }
 
 const THEME_COLORS = [
@@ -22,10 +27,17 @@ const THEME_COLORS = [
   '#db2777', // Pink
 ];
 
-export const Settings: React.FC<SettingsProps> = ({ profile, onUpdate }) => {
+export const Settings: React.FC<SettingsProps> = ({ profile, user, onUpdate, onUpdateUser, onLogout, onDeleteAccount }) => {
   const [formData, setFormData] = useState<BusinessProfile>(profile);
+  const [userData, setUserData] = useState<User>({ ...user, password: user.password || '' });
   const [newMaterial, setNewMaterial] = useState('');
   const [isSaved, setIsSaved] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  useEffect(() => {
+    setUserData(user);
+  }, [user]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target as HTMLInputElement;
@@ -73,6 +85,42 @@ export const Settings: React.FC<SettingsProps> = ({ profile, onUpdate }) => {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
+        {/* User Account */}
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          <div className="p-4 border-b border-slate-200 bg-slate-50 flex items-center gap-2">
+            <Building2 size={20} className="text-blue-600" />
+            <h3 className="font-bold text-slate-800">Account Settings</h3>
+          </div>
+          <div className="p-6 space-y-6">
+             <div className="space-y-2">
+                <label className="text-xs font-black text-slate-400 uppercase tracking-widest">Username</label>
+                <input 
+                  type="text" 
+                  name="username"
+                  value={userData.username} 
+                  onChange={(e) => setUserData(prev => ({ ...prev, username: e.target.value }))}
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 font-bold"
+                />
+             </div>
+             <div className="space-y-2">
+                <label className="text-xs font-black text-slate-400 uppercase tracking-widest">Password</label>
+                <div className="relative">
+                  <input 
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    value={userData.password || ''} 
+                    onChange={(e) => setUserData(prev => ({ ...prev, password: e.target.value }))}
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 font-bold"
+                  />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+             </div>
+             <button type="button" onClick={() => onUpdateUser(userData)} className="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition-colors">Update Account</button>
+          </div>
+        </div>
+
         {/* Business Profile */}
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
           <div className="p-4 border-b border-slate-200 bg-slate-50 flex items-center gap-2">
@@ -91,19 +139,6 @@ export const Settings: React.FC<SettingsProps> = ({ profile, onUpdate }) => {
                   placeholder="e.g. Balvi Printing Press"
                 />
                 <p className="text-[10px] text-slate-500 italic">This name will appear on the top of your estimates and in the sidebar.</p>
-             </div>
-
-             <div className="space-y-2">
-                <label className="text-xs font-black text-slate-400 uppercase tracking-widest">Google Client ID (for Cloud Sync)</label>
-                <input 
-                  type="text" 
-                  name="googleClientId"
-                  value={formData.googleClientId || ''} 
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 font-bold"
-                  placeholder="your_id.apps.googleusercontent.com"
-                />
-                <p className="text-[10px] text-slate-500 italic">Required for Google Drive backup. Get this from Google Cloud Console.</p>
              </div>
 
              <div className="space-y-2">
@@ -262,7 +297,25 @@ export const Settings: React.FC<SettingsProps> = ({ profile, onUpdate }) => {
             <button type="button" onClick={() => setFormData(profile)} className="px-6 py-3 bg-white border border-slate-300 rounded-lg text-slate-600 font-bold transition-all shadow-lg">Reset</button>
             <button type="submit" className="bg-blue-600 text-white px-10 py-3 rounded-lg hover:bg-blue-700 transition-all font-black shadow-lg shadow-blue-200">Save All Settings</button>
         </div>
+
+        <div className="bg-white rounded-xl border border-rose-200 shadow-sm overflow-hidden mt-10">
+          <div className="p-4 border-b border-rose-200 bg-rose-50 flex items-center gap-2">
+            <ShieldAlert size={20} className="text-rose-600" />
+            <h3 className="font-bold text-rose-800">Danger Zone</h3>
+          </div>
+          <div className="p-6 flex gap-4">
+            <button type="button" onClick={onLogout} className="bg-slate-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-slate-700 transition-colors">Logout</button>
+            <button type="button" onClick={() => setShowDeleteModal(true)} className="bg-rose-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-rose-700 transition-colors">Delete Account</button>
+          </div>
+        </div>
       </form>
+      <ConfirmationModal 
+        isOpen={showDeleteModal}
+        title="Delete Account"
+        message="Are you sure? This will delete all your data and cannot be undone."
+        onConfirm={onDeleteAccount}
+        onCancel={() => setShowDeleteModal(false)}
+      />
     </div>
   );
 };
