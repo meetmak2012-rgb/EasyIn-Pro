@@ -21,6 +21,8 @@ export interface BusinessProfile {
   currencySymbol: string;
   pdfFooterNote: string;
   pdfThemeColor: string;
+  uiPrimaryColor?: string;
+  themeMode?: 'light' | 'dark';
   defaultStatus: 'PAID' | 'UNPAID';
   materials: string[];
   showSqFtInPdf: boolean;

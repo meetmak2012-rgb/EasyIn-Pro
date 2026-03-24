@@ -28,7 +28,6 @@
   },
   "dependencies": {
     "@azure/msal-browser": "^5.5.0",
-    "@google/genai": "^1.44.0",
     "@tailwindcss/vite": "^4.2.1",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
@@ -40,6 +39,7 @@
     "react-dom": "^19.2.4",
     "react-is": "^19.2.4",
     "recharts": "^3.7.0",
-    "tailwindcss": "^4.2.1"
+    "tailwindcss": "^4.2.1",
+    "xlsx": "^0.18.5"
   }
 }

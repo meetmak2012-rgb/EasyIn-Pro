@@ -8,8 +8,7 @@ import {
   Ruler,
   Settings as SettingsIcon,
   ChevronRight,
-  ClipboardList,
-  Sparkles
+  ClipboardList
 } from 'lucide-react';
 
 interface LayoutProps {
@@ -26,7 +25,6 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeTab, onNavigate,
     { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={18} /> },
     { id: 'sales', label: 'Sales (Estimates)', icon: <ClipboardList size={18} /> },
     { id: 'reports', label: 'Reports & Analytics', icon: <FileText size={18} /> },
-    { id: 'ai', label: 'AI Advisor', icon: <Sparkles size={18} /> },
     { id: 'converter', label: 'Unit Converter', icon: <Ruler size={18} /> },
     { id: 'data', label: 'Backup & Restore', icon: <Database size={18} /> },
     { id: 'settings', label: 'Settings', icon: <SettingsIcon size={18} /> },
@@ -55,7 +53,10 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeTab, onNavigate,
               </div>
               <div className="flex flex-col min-w-0">
                 <span className="text-xs font-black text-white truncate">{businessName}</span>
-                <span className="text-[9px] font-bold text-slate-400 truncate uppercase tracking-tighter">Local Ledger Active</span>
+                <div className="flex items-center gap-1">
+                  <span className="text-[9px] font-bold text-slate-400 truncate uppercase tracking-tighter">Local Ledger Active</span>
+                  <Database size={8} className="text-emerald-500" />
+                </div>
               </div>
             </div>
           </div>

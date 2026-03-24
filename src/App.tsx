@@ -8,7 +8,6 @@ import { Reports } from './components/Reports';
 import { DataManagement } from './components/DataManagement';
 import { Settings } from './components/Settings';
 import { UnitConverter } from './components/UnitConverter';
-import { AiAdvisor } from './components/AiAdvisor';
 import { Auth } from './components/Auth';
 import { Transaction, BusinessProfile, TransactionType, User } from './types';
 
@@ -132,7 +131,6 @@ const App: React.FC = () => {
         );
 
       case 'reports': return <Reports transactions={transactions} />;
-      case 'ai': return <AiAdvisor transactions={transactions} />;
       case 'converter': return <UnitConverter />;
       case 'data': return <DataManagement transactions={transactions} onImport={setTransactions} profile={businessProfile} />;
       case 'settings': return <Settings 

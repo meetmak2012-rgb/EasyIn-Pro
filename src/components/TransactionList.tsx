@@ -5,7 +5,7 @@ import {
 } from 'lucide-react';
 import { Transaction, BusinessProfile } from '../types';
 import { generateInvoicePDF } from '../utils/pdfGenerator';
-import { exportTransactionsToCSV, copyTransactionsToClipboard } from '../utils/csvExporter';
+import { exportTransactionsToExcel, copyTransactionsToClipboard } from '../utils/excelExporter';
 
 interface TransactionListProps {
   transactions: Transaction[];
@@ -78,7 +78,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({ transactions, 
              <button onClick={() => copyTransactionsToClipboard(filtered)} className="flex-1 md:flex-none p-2.5 bg-white border border-slate-200 rounded-xl text-slate-500 hover:bg-slate-50 hover:text-emerald-600 transition-colors" title="Copy for Sheets">
                 <ClipboardCheck size={20} />
              </button>
-             <button onClick={() => exportTransactionsToCSV(filtered, "Estimates_Export")} className="flex-1 md:flex-none p-2.5 bg-white border border-slate-200 rounded-xl text-slate-500 hover:bg-slate-50 hover:text-blue-600 transition-colors" title="Export CSV">
+             <button onClick={() => exportTransactionsToExcel(filtered, "Estimates_Export")} className="flex-1 md:flex-none p-2.5 bg-white border border-slate-200 rounded-xl text-slate-500 hover:bg-slate-50 hover:text-blue-600 transition-colors" title="Export Excel">
                 <FileText size={20} />
              </button>
              <button 

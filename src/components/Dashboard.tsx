@@ -32,7 +32,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ transactions, onAddInvoice
   }, [transactions]);
 
   const chartData = [
-    { name: 'Total Estimates', amount: stats.totalSales, color: '#2563eb' },
+    { name: 'Total Estimates', amount: stats.totalSales, color: 'var(--primary-color, #2563eb)' },
     { name: 'Confirmed Sales', amount: stats.collected, color: '#10b981' },
     { name: 'Outstanding', amount: stats.pendingSales, color: '#f43f5e' },
   ];
@@ -41,34 +41,34 @@ export const Dashboard: React.FC<DashboardProps> = ({ transactions, onAddInvoice
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-black text-slate-900 tracking-tight">Sales Dashboard</h1>
-          <p className="text-slate-500 font-medium">Tracking your sales performance and collections.</p>
+          <h1 className="text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight">Sales Dashboard</h1>
+          <p className="text-slate-500 dark:text-slate-400 font-medium">Tracking your sales performance and collections.</p>
         </div>
         <div className="flex gap-3">
-          <button onClick={onAddInvoice} className="bg-blue-600 text-white px-8 py-3 rounded-xl hover:bg-blue-700 transition-all font-black shadow-lg shadow-blue-200 uppercase tracking-widest text-xs">
+          <button onClick={onAddInvoice} className="bg-primary text-white px-8 py-3 rounded-xl hover:opacity-90 transition-all font-black shadow-lg shadow-primary/20 uppercase tracking-widest text-xs">
             New Estimate
           </button>
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <StatCard title="Total Estimates" amount={stats.totalSales} icon={<TrendingUp size={20} />} color="blue" />
+        <StatCard title="Total Estimates" amount={stats.totalSales} icon={<TrendingUp size={20} />} color="primary" />
         <StatCard title="Confirmed Sales" amount={stats.collected} icon={<CheckCircle2 size={20} />} color="emerald" />
         <StatCard title="Outstanding" amount={stats.pendingSales} icon={<Clock size={20} />} color="rose" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
+        <div className="lg:col-span-2 bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
           <div className="flex items-center justify-between mb-8">
-            <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">Sales Snapshot</h3>
+            <h3 className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">Sales Snapshot</h3>
           </div>
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartData} margin={{ left: 0, right: 0, top: 10, bottom: 0 }}>
                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontWeight: 'bold', fill: '#94a3b8', fontSize: 10 }} dy={10} />
                 <Tooltip 
-                  cursor={{ fill: '#f1f5f9' }} 
-                  contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)', padding: '12px' }}
+                  cursor={{ fill: 'rgba(var(--primary-color-rgb, 37, 99, 235), 0.05)' }} 
+                  contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)', padding: '12px', backgroundColor: 'var(--tooltip-bg, #fff)', color: 'var(--tooltip-text, #000)' }}
                 />
                 <Bar dataKey="amount" radius={[8, 8, 0, 0]} barSize={60}>
                   {chartData.map((entry, index) => (
@@ -80,16 +80,16 @@ export const Dashboard: React.FC<DashboardProps> = ({ transactions, onAddInvoice
           </div>
         </div>
 
-        <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
-           <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-8">Collection Insights</h3>
+        <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
+           <h3 className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-8">Collection Insights</h3>
            <div className="space-y-6">
               <StatusProgress label="Recovery Rate" value={stats.collected} total={stats.totalSales} color="bg-emerald-500" />
-              <div className="pt-6 border-t border-slate-100">
-                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Revenue Analysis</p>
+              <div className="pt-6 border-t border-slate-100 dark:border-slate-800">
+                 <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3">Revenue Analysis</p>
                  <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center text-xs">
-                       <span className="text-slate-500">Confirmed Portion:</span>
-                       <span className="font-bold text-emerald-600">
+                       <span className="text-slate-500 dark:text-slate-400">Confirmed Portion:</span>
+                       <span className="font-bold text-emerald-600 dark:text-emerald-400">
                          {stats.totalSales > 0 ? ((stats.collected / stats.totalSales) * 100).toFixed(1) : 0}%
                        </span>
                     </div>
@@ -102,9 +102,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ transactions, onAddInvoice
   );
 };
 
-const StatCard = ({ title, amount, icon, color }: { title: string, amount: number, icon: any, color: 'blue' | 'emerald' | 'rose' }) => {
+const StatCard = ({ title, amount, icon, color }: { title: string, amount: number, icon: any, color: 'primary' | 'emerald' | 'rose' }) => {
   const styles = {
-    blue: 'bg-blue-600 text-white shadow-blue-200',
+    primary: 'bg-primary text-white shadow-primary/20',
     emerald: 'bg-emerald-600 text-white shadow-emerald-200',
     rose: 'bg-rose-600 text-white shadow-rose-200',
   };

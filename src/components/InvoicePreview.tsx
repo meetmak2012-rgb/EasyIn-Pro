@@ -78,7 +78,7 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({ transaction, pro
           </div>
           <div className="flex justify-end gap-8 text-xl pt-4 border-t border-slate-100">
             <span className="font-black text-slate-900 uppercase tracking-tighter">Total:</span>
-            <span className="font-black text-blue-600 w-32">{CURRENCY_SYMBOL}{transaction.grandTotal.toLocaleString()}</span>
+            <span className="font-black text-primary w-32">{CURRENCY_SYMBOL}{transaction.grandTotal.toLocaleString()}</span>
           </div>
         </div>
       </div>

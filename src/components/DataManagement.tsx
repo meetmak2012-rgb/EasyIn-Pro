@@ -4,6 +4,7 @@ import { Download, Upload, ShieldCheck, History, RefreshCcw, Cloud } from 'lucid
 import { Transaction, BusinessProfile } from '../types';
 import { syncToDrive, restoreFromDrive, initGapi } from '../services/googleDriveService';
 import { syncToOneDrive, restoreFromOneDrive } from '../services/oneDriveService';
+import { exportTransactionsToExcel } from '../utils/excelExporter';
 
 interface DataManagementProps {
   transactions: Transaction[];
@@ -179,6 +180,19 @@ export const DataManagement: React.FC<DataManagementProps> = ({ transactions, on
        </div>
 
        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center text-center space-y-4">
+             <div className="p-3 bg-slate-50 text-slate-600 rounded-xl">
+                <Download size={32} />
+             </div>
+             <div className="space-y-1">
+                <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider">Export Excel</h3>
+                <p className="text-xs text-slate-500 leading-relaxed">Download detailed records as a .xlsx file.</p>
+             </div>
+             <button onClick={() => exportTransactionsToExcel(transactions, "Full_Database_Export")} className="px-4 py-2 bg-white border border-slate-200 text-slate-900 rounded-lg hover:bg-slate-50 font-black w-full shadow-sm uppercase tracking-widest text-[10px]">
+                Download
+             </button>
+          </div>
+
           <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center text-center space-y-4">
              <div className="p-3 bg-slate-50 text-slate-600 rounded-xl">
                 <Download size={32} />

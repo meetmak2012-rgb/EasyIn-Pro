@@ -2,7 +2,7 @@
 import React, { useMemo } from 'react';
 import { Transaction, TransactionType } from '../types';
 import { IndianRupee, Download, ClipboardList, CheckCircle } from 'lucide-react';
-import { exportTransactionsToCSV } from '../utils/csvExporter';
+import { exportTransactionsToExcel } from '../utils/excelExporter';
 
 interface ReportsProps {
   transactions: Transaction[];
@@ -33,11 +33,11 @@ export const Reports: React.FC<ReportsProps> = ({ transactions }) => {
           <p className="text-slate-500 font-medium">Detailed analysis of your sales estimates and collections.</p>
         </div>
         <button 
-          onClick={() => exportTransactionsToCSV(transactions, "Sales_Performance_Report")}
+          onClick={() => exportTransactionsToExcel(transactions, "Sales_Performance_Report")}
           className="flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-xl hover:bg-blue-700 transition-all font-black shadow-lg shadow-blue-200 text-xs uppercase tracking-widest"
         >
           <Download size={18} />
-          Export All (CSV)
+          Export All (Excel)
         </button>
       </div>
 

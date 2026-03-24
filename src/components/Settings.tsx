@@ -74,11 +74,11 @@ export const Settings: React.FC<SettingsProps> = ({ profile, user, onUpdate, onU
     <div className="max-w-4xl mx-auto space-y-6 pb-20">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 leading-none">Settings & Customization</h1>
-          <p className="text-slate-500 mt-2">Manage your business identity and visual PDF branding.</p>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 leading-none">Settings & Customization</h1>
+          <p className="text-slate-500 dark:text-slate-400 mt-2">Manage your business identity and visual PDF branding.</p>
         </div>
         {isSaved && (
-          <div className="bg-green-100 text-green-700 px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 animate-in fade-in zoom-in duration-300">
+          <div className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 animate-in fade-in zoom-in duration-300">
             <FileCheck size={18} /> Settings Saved!
           </div>
         )}
@@ -86,69 +86,69 @@ export const Settings: React.FC<SettingsProps> = ({ profile, user, onUpdate, onU
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* User Account */}
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-          <div className="p-4 border-b border-slate-200 bg-slate-50 flex items-center gap-2">
-            <Building2 size={20} className="text-blue-600" />
-            <h3 className="font-bold text-slate-800">Account Settings</h3>
+        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+          <div className="p-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex items-center gap-2">
+            <Building2 size={20} className="text-primary" />
+            <h3 className="font-bold text-slate-800 dark:text-slate-100">Account Settings</h3>
           </div>
           <div className="p-6 space-y-6">
              <div className="space-y-2">
-                <label className="text-xs font-black text-slate-400 uppercase tracking-widest">Username</label>
+                <label className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Username</label>
                 <input 
                   type="text" 
                   name="username"
                   value={userData.username} 
                   onChange={(e) => setUserData(prev => ({ ...prev, username: e.target.value }))}
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 font-bold"
+                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-primary font-bold text-slate-900 dark:text-slate-100"
                 />
              </div>
              <div className="space-y-2">
-                <label className="text-xs font-black text-slate-400 uppercase tracking-widest">Password</label>
+                <label className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Password</label>
                 <div className="relative">
                   <input 
                     type={showPassword ? "text" : "password"}
                     name="password"
                     value={userData.password || ''} 
                     onChange={(e) => setUserData(prev => ({ ...prev, password: e.target.value }))}
-                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 font-bold"
+                    className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-primary font-bold text-slate-900 dark:text-slate-100"
                   />
                   <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
              </div>
-             <button type="button" onClick={() => onUpdateUser(userData)} className="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition-colors">Update Account</button>
+             <button type="button" onClick={() => onUpdateUser(userData)} className="bg-primary text-white px-6 py-2 rounded-lg font-bold hover:opacity-90 transition-colors">Update Account</button>
           </div>
         </div>
 
         {/* Business Profile */}
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-          <div className="p-4 border-b border-slate-200 bg-slate-50 flex items-center gap-2">
-            <Building2 size={20} className="text-blue-600" />
-            <h3 className="font-bold text-slate-800">Business Identity</h3>
+        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+          <div className="p-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex items-center gap-2">
+            <Building2 size={20} className="text-primary" />
+            <h3 className="font-bold text-slate-800 dark:text-slate-100">Business Identity</h3>
           </div>
           <div className="p-6 space-y-6">
              <div className="space-y-2">
-                <label className="text-xs font-black text-slate-400 uppercase tracking-widest">Company / Business Name</label>
+                <label className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Company / Business Name</label>
                 <input 
                   type="text" 
                   name="businessName"
                   value={formData.businessName} 
                   onChange={handleChange}
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 font-bold"
+                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-primary font-bold text-slate-900 dark:text-slate-100"
                   placeholder="e.g. Balvi Printing Press"
                 />
                 <p className="text-[10px] text-slate-500 italic">This name will appear on the top of your estimates and in the sidebar.</p>
              </div>
 
              <div className="space-y-2">
-                <label className="text-xs font-black text-slate-400 uppercase tracking-widest">OneDrive Client ID (for Cloud Sync)</label>
+                <label className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">OneDrive Client ID (for Cloud Sync)</label>
                 <input 
                   type="text" 
                   name="oneDriveClientId"
                   value={formData.oneDriveClientId || ''} 
                   onChange={handleChange}
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 font-bold"
+                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-primary font-bold text-slate-900 dark:text-slate-100"
                   placeholder="your_client_id_here"
                 />
                 <p className="text-[10px] text-slate-500 italic">Required for OneDrive backup. Get this from Azure Portal.</p>
@@ -156,14 +156,64 @@ export const Settings: React.FC<SettingsProps> = ({ profile, user, onUpdate, onU
           </div>
         </div>
 
+        {/* App Theme */}
+        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+          <div className="p-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex items-center gap-2">
+            <Palette size={20} className="text-primary" />
+            <h3 className="font-bold text-slate-800 dark:text-slate-100">App Theme</h3>
+          </div>
+          <div className="p-6 space-y-6">
+             <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+                <div>
+                  <h4 className="font-bold text-slate-800 dark:text-slate-100 text-sm">Dark Mode</h4>
+                  <p className="text-[10px] text-slate-500">Switch between light and dark interface.</p>
+                </div>
+                <button 
+                  type="button" 
+                  onClick={() => setFormData(prev => ({ ...prev, themeMode: prev.themeMode === 'dark' ? 'light' : 'dark' }))} 
+                  className={`transition-all p-1 rounded-full ${formData.themeMode === 'dark' ? 'text-primary' : 'text-slate-300'}`}
+                >
+                  {formData.themeMode === 'dark' ? <ToggleRight size={36} /> : <ToggleLeft size={36} />}
+                </button>
+             </div>
+
+             <div className="space-y-4">
+                <label className="text-xs font-black text-slate-400 uppercase tracking-widest block">App Primary Color</label>
+                <div className="flex flex-wrap gap-4">
+                   {THEME_COLORS.map(color => (
+                     <button
+                       key={color}
+                       type="button"
+                       onClick={() => setFormData(prev => ({ ...prev, uiPrimaryColor: color }))}
+                       className={`w-12 h-12 rounded-full border-4 transition-all transform hover:scale-110 ${
+                         formData.uiPrimaryColor === color ? 'border-primary ring-2 ring-primary/20' : 'border-white dark:border-slate-800 ring-1 ring-slate-100 dark:ring-slate-700 shadow-sm'
+                       }`}
+                       style={{ backgroundColor: color }}
+                     />
+                   ))}
+                   <div className="relative group">
+                     <input 
+                       type="color" 
+                       name="uiPrimaryColor" 
+                       value={formData.uiPrimaryColor || '#2563eb'} 
+                       onChange={handleChange}
+                       className="w-12 h-12 rounded-full overflow-hidden border-4 border-white dark:border-slate-800 ring-1 ring-slate-100 dark:ring-slate-700 cursor-pointer shadow-sm"
+                     />
+                     <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 hidden group-hover:block whitespace-nowrap text-[8pt] font-black text-slate-400 uppercase">Custom</div>
+                   </div>
+                </div>
+             </div>
+          </div>
+        </div>
+
         {/* Visual Branding */}
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-          <div className="p-4 border-b border-slate-200 bg-slate-50 flex items-center gap-2">
+        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+          <div className="p-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex items-center gap-2">
             <Palette size={20} className="text-pink-600" />
-            <h3 className="font-bold text-slate-800">Visual Branding</h3>
+            <h3 className="font-bold text-slate-800 dark:text-slate-100">Visual Branding (PDF)</h3>
           </div>
           <div className="p-6">
-             <label className="text-xs font-black text-slate-400 uppercase tracking-widest block mb-4">Invoice Primary Theme Color</label>
+             <label className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block mb-4">Invoice Primary Theme Color</label>
              <div className="flex flex-wrap gap-4">
                 {THEME_COLORS.map(color => (
                   <button
@@ -171,7 +221,7 @@ export const Settings: React.FC<SettingsProps> = ({ profile, user, onUpdate, onU
                     type="button"
                     onClick={() => setFormData(prev => ({ ...prev, pdfThemeColor: color }))}
                     className={`w-12 h-12 rounded-full border-4 transition-all transform hover:scale-110 ${
-                      formData.pdfThemeColor === color ? 'border-blue-500 ring-2 ring-blue-200' : 'border-white ring-1 ring-slate-100 shadow-sm'
+                      formData.pdfThemeColor === color ? 'border-primary ring-2 ring-primary/20' : 'border-white dark:border-slate-800 ring-1 ring-slate-100 dark:ring-slate-700 shadow-sm'
                     }`}
                     style={{ backgroundColor: color }}
                   />
@@ -182,7 +232,7 @@ export const Settings: React.FC<SettingsProps> = ({ profile, user, onUpdate, onU
                     name="pdfThemeColor" 
                     value={formData.pdfThemeColor} 
                     onChange={handleChange}
-                    className="w-12 h-12 rounded-full overflow-hidden border-4 border-white ring-1 ring-slate-100 cursor-pointer shadow-sm"
+                    className="w-12 h-12 rounded-full overflow-hidden border-4 border-white dark:border-slate-800 ring-1 ring-slate-100 dark:ring-slate-700 cursor-pointer shadow-sm"
                   />
                   <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 hidden group-hover:block whitespace-nowrap text-[8pt] font-black text-slate-400 uppercase">Custom</div>
                 </div>
@@ -191,15 +241,15 @@ export const Settings: React.FC<SettingsProps> = ({ profile, user, onUpdate, onU
         </div>
 
         {/* Business Logic Limits */}
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-          <div className="p-4 border-b border-slate-200 bg-slate-50 flex items-center gap-2">
+        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+          <div className="p-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex items-center gap-2">
             <ShieldAlert size={20} className="text-orange-600" />
-            <h3 className="font-bold text-slate-800">Calculation Rules & Limits</h3>
+            <h3 className="font-bold text-slate-800 dark:text-slate-100">Calculation Rules & Limits</h3>
           </div>
           <div className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                <div className="space-y-2">
-                  <label className="text-xs font-black text-slate-400 uppercase tracking-widest">Min SqFt per Piece</label>
+                  <label className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Min SqFt per Piece</label>
                   <div className="relative">
                     <input 
                       type="number" 
@@ -207,16 +257,16 @@ export const Settings: React.FC<SettingsProps> = ({ profile, user, onUpdate, onU
                       step="0.1"
                       value={formData.minSqFtPerPiece} 
                       onChange={handleChange}
-                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 font-bold"
+                      className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-primary font-bold text-slate-900 dark:text-slate-100"
                       placeholder="e.g. 1.0"
                     />
-                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-400">SQFT</span>
+                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-400 uppercase">SQFT</span>
                   </div>
                   <p className="text-[10px] text-slate-500 italic">Example: If W*H = 0.5, it will charge for {formData.minSqFtPerPiece || 'X'}.</p>
                </div>
 
                <div className="space-y-2">
-                  <label className="text-xs font-black text-slate-400 uppercase tracking-widest">Min Amount per Line</label>
+                  <label className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Min Amount per Line</label>
                   <div className="relative">
                     <input 
                       type="number" 
@@ -224,7 +274,7 @@ export const Settings: React.FC<SettingsProps> = ({ profile, user, onUpdate, onU
                       step="1"
                       value={formData.minItemAmount} 
                       onChange={handleChange}
-                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 font-bold"
+                      className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-primary font-bold text-slate-900 dark:text-slate-100"
                       placeholder="e.g. 50"
                     />
                     <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-400">{profile.currencySymbol}</span>
@@ -236,10 +286,10 @@ export const Settings: React.FC<SettingsProps> = ({ profile, user, onUpdate, onU
         </div>
 
         {/* Material Manager */}
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-          <div className="p-4 border-b border-slate-200 bg-slate-50 flex items-center gap-2">
+        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+          <div className="p-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex items-center gap-2">
             <Layers size={20} className="text-indigo-600" />
-            <h3 className="font-bold text-slate-800">Materials Master</h3>
+            <h3 className="font-bold text-slate-800 dark:text-slate-100">Materials Master</h3>
           </div>
           <div className="p-6 space-y-4">
             <div className="flex gap-2">
@@ -248,17 +298,17 @@ export const Settings: React.FC<SettingsProps> = ({ profile, user, onUpdate, onU
                 value={newMaterial} 
                 onChange={(e) => setNewMaterial(e.target.value)} 
                 placeholder="New material (e.g. Star Flex)"
-                className="flex-1 px-4 py-2 border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 px-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-primary text-slate-900 dark:text-slate-100"
                 onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddMaterial())}
               />
-              <button type="button" onClick={handleAddMaterial} className="bg-indigo-600 text-white px-6 py-2 rounded-lg flex items-center gap-2 font-bold hover:bg-indigo-700 transition-colors">
+              <button type="button" onClick={handleAddMaterial} className="bg-indigo-600 text-white px-6 py-2 rounded-lg flex items-center gap-2 font-bold hover:opacity-90 transition-colors">
                 <Plus size={18} /> Add
               </button>
             </div>
             <div className="flex flex-wrap gap-2 pt-2">
               {formData.materials.map(m => (
-                <div key={m} className="flex items-center gap-2 bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-lg group hover:bg-white hover:border-blue-200 transition-all">
-                  <span className="text-sm font-bold text-slate-700">{m}</span>
+                <div key={m} className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3 py-1.5 rounded-lg group hover:bg-white dark:hover:bg-slate-700 hover:border-primary transition-all">
+                  <span className="text-sm font-bold text-slate-700 dark:text-slate-300">{m}</span>
                   <button type="button" onClick={() => handleRemoveMaterial(m)} className="text-slate-300 hover:text-red-500 transition-colors">
                     <Trash2 size={14} />
                   </button>
@@ -269,39 +319,39 @@ export const Settings: React.FC<SettingsProps> = ({ profile, user, onUpdate, onU
         </div>
 
         {/* PDF Table & Footer */}
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-          <div className="p-4 border-b border-slate-200 bg-slate-50 flex items-center gap-2">
+        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+          <div className="p-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex items-center gap-2">
             <FileText size={20} className="text-emerald-600" />
-            <h3 className="font-bold text-slate-800">PDF Table & Footer</h3>
+            <h3 className="font-bold text-slate-800 dark:text-slate-100">PDF Table & Footer</h3>
           </div>
           <div className="p-6 space-y-6">
              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg border border-slate-200">
-                  <h4 className="font-bold text-slate-800 text-sm">SqFt Column</h4>
-                  <button type="button" onClick={() => setFormData(prev => ({ ...prev, showSqFtInPdf: !prev.showSqFtInPdf }))} className={`transition-all p-1 rounded-full ${formData.showSqFtInPdf ? 'text-blue-600' : 'text-slate-300'}`}>
+                <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+                  <h4 className="font-bold text-slate-800 dark:text-slate-100 text-sm">SqFt Column</h4>
+                  <button type="button" onClick={() => setFormData(prev => ({ ...prev, showSqFtInPdf: !prev.showSqFtInPdf }))} className={`transition-all p-1 rounded-full ${formData.showSqFtInPdf ? 'text-primary' : 'text-slate-300'}`}>
                     {formData.showSqFtInPdf ? <ToggleRight size={36} /> : <ToggleLeft size={36} />}
                   </button>
                 </div>
-                <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg border border-slate-200">
-                  <h4 className="font-bold text-slate-800 text-sm">Material Type</h4>
-                  <button type="button" onClick={() => setFormData(prev => ({ ...prev, showMaterialInPdf: !prev.showMaterialInPdf }))} className={`transition-all p-1 rounded-full ${formData.showMaterialInPdf ? 'text-blue-600' : 'text-slate-300'}`}>
+                <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+                  <h4 className="font-bold text-slate-800 dark:text-slate-100 text-sm">Material Type</h4>
+                  <button type="button" onClick={() => setFormData(prev => ({ ...prev, showMaterialInPdf: !prev.showMaterialInPdf }))} className={`transition-all p-1 rounded-full ${formData.showMaterialInPdf ? 'text-primary' : 'text-slate-300'}`}>
                     {formData.showMaterialInPdf ? <ToggleRight size={36} /> : <ToggleLeft size={36} />}
                   </button>
                 </div>
              </div>
-             <textarea name="pdfFooterNote" value={formData.pdfFooterNote} onChange={handleChange} className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none h-24 focus:bg-white focus:ring-2 focus:ring-blue-500" placeholder="Default footer terms..."/>
+             <textarea name="pdfFooterNote" value={formData.pdfFooterNote} onChange={handleChange} className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none h-24 focus:bg-white dark:focus:bg-slate-800 focus:ring-2 focus:ring-primary text-slate-900 dark:text-slate-100" placeholder="Default footer terms..."/>
           </div>
         </div>
 
         <div className="flex justify-end gap-3 sticky bottom-6 z-10">
-            <button type="button" onClick={() => setFormData(profile)} className="px-6 py-3 bg-white border border-slate-300 rounded-lg text-slate-600 font-bold transition-all shadow-lg">Reset</button>
-            <button type="submit" className="bg-blue-600 text-white px-10 py-3 rounded-lg hover:bg-blue-700 transition-all font-black shadow-lg shadow-blue-200">Save All Settings</button>
+            <button type="button" onClick={() => setFormData(profile)} className="px-6 py-3 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-600 dark:text-slate-400 font-bold transition-all shadow-lg">Reset</button>
+            <button type="submit" className="bg-primary text-white px-10 py-3 rounded-lg hover:opacity-90 transition-all font-black shadow-lg shadow-primary/20">Save All Settings</button>
         </div>
 
-        <div className="bg-white rounded-xl border border-rose-200 shadow-sm overflow-hidden mt-10">
-          <div className="p-4 border-b border-rose-200 bg-rose-50 flex items-center gap-2">
+        <div className="bg-white dark:bg-slate-900 rounded-xl border border-rose-200 dark:border-rose-900/50 shadow-sm overflow-hidden mt-10">
+          <div className="p-4 border-b border-rose-200 dark:border-rose-900/50 bg-rose-50 dark:bg-rose-900/20 flex items-center gap-2">
             <ShieldAlert size={20} className="text-rose-600" />
-            <h3 className="font-bold text-rose-800">Danger Zone</h3>
+            <h3 className="font-bold text-rose-800 dark:text-rose-100">Danger Zone</h3>
           </div>
           <div className="p-6 flex gap-4">
             <button type="button" onClick={onLogout} className="bg-slate-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-slate-700 transition-colors">Logout</button>
