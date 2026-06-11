@@ -1,9 +1,10 @@
 
 import React, { useRef, useState, useEffect } from 'react';
-import { Download, Upload, ShieldCheck, History, RefreshCcw, Cloud } from 'lucide-react';
+import { Download, Upload, ShieldCheck, History, RefreshCcw, Cloud, FileSpreadsheet } from 'lucide-react';
 import { Transaction, BusinessProfile, User } from '../types';
 import { syncToDrive, restoreFromDrive } from '../services/googleDriveService';
 import { syncToOneDrive, restoreFromOneDrive } from '../services/oneDriveService';
+import { syncToGoogleSheets } from '../services/googleSheetsService';
 import { exportTransactionsToExcel } from '../utils/excelExporter';
 
 interface DataManagementProps {
@@ -18,10 +19,15 @@ export const DataManagement: React.FC<DataManagementProps> = ({ transactions, on
   const [lastAutoBackup, setLastAutoBackup] = useState<string | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
   const [isOneDriveSyncing, setIsOneDriveSyncing] = useState(false);
+  const [isSheetsSyncing, setIsSheetsSyncing] = useState(false);
+  const [spreadsheetUrl, setSpreadsheetUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const last = localStorage.getItem('easyin_last_autobackup');
     if (last) setLastAutoBackup(new Date(last).toLocaleString());
+    
+    const lastSheetUrl = localStorage.getItem('easyin_last_google_sheet_url');
+    if (lastSheetUrl) setSpreadsheetUrl(lastSheetUrl);
   }, []);
 
   const handleBackup = () => {
@@ -66,6 +72,26 @@ export const DataManagement: React.FC<DataManagementProps> = ({ transactions, on
       alert('Failed to restore from Google Drive: ' + (err.message || 'Check console for details.'));
     } finally {
       setIsSyncing(false);
+    }
+  };
+
+  const handleSheetsSync = async () => {
+    const confirmed = window.confirm(
+      "Sync estimates to Google Sheets? This will recreate or update your existing spreadsheet data 'EasyIn Estimates & Line Items' with your current records."
+    );
+    if (!confirmed) return;
+
+    setIsSheetsSyncing(true);
+    try {
+      const res = await syncToGoogleSheets(transactions);
+      setSpreadsheetUrl(res.spreadsheetUrl);
+      localStorage.setItem('easyin_last_google_sheet_url', res.spreadsheetUrl);
+      alert('Estimates and line items successfully synced to Google Sheets!');
+    } catch (err: any) {
+      console.error(err);
+      alert('Failed to sync to Google Sheets: ' + (err.message || 'Check console for details.'));
+    } finally {
+      setIsSheetsSyncing(false);
     }
   };
 
@@ -250,6 +276,45 @@ export const DataManagement: React.FC<DataManagementProps> = ({ transactions, on
                >
                   {isSyncing ? '...' : 'Load'}
                </button>
+             </div>
+          </div>
+
+          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center text-center space-y-4 border-emerald-200">
+             <div className="p-3 bg-emerald-50 text-emerald-600 rounded-xl">
+                <FileSpreadsheet size={32} />
+             </div>
+             <div className="space-y-1">
+                <h3 className="text-sm font-black text-emerald-900 uppercase tracking-wider">Google Sheets</h3>
+                <p className="text-xs text-slate-500 leading-relaxed">
+                  Export & live update estimates and line items.
+                </p>
+             </div>
+             <div className="flex gap-2 w-full">
+               <button 
+                 disabled={isSheetsSyncing || isSyncing}
+                 onClick={handleSheetsSync} 
+                 className="flex-1 px-2 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-black shadow-lg shadow-emerald-100 uppercase tracking-widest text-[10px] disabled:opacity-50"
+               >
+                  {isSheetsSyncing ? '...' : 'Sync'}
+               </button>
+               {spreadsheetUrl ? (
+                 <a 
+                   href={spreadsheetUrl}
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   className="flex-1 px-2 py-2 bg-white border border-emerald-200 text-emerald-600 rounded-lg hover:bg-emerald-50 font-black text-center uppercase tracking-widest text-[10px] flex items-center justify-center"
+                 >
+                    Open
+                 </a>
+               ) : (
+                 <button 
+                   disabled
+                   className="flex-1 px-2 py-2 bg-slate-50 border border-slate-100 text-slate-300 rounded-lg font-black uppercase tracking-widest text-[10px] cursor-not-allowed"
+                   title="Sync first to generate the Google Sheet"
+                 >
+                    Open
+                 </button>
+               )}
              </div>
           </div>
 

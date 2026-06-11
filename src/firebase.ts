@@ -12,3 +12,4 @@ export const googleProvider = new GoogleAuthProvider();
 // Set standard scope or parameters if needed
 googleProvider.setCustomParameters({ prompt: 'select_account' });
 googleProvider.addScope('https://www.googleapis.com/auth/drive.file');
+googleProvider.addScope('https://www.googleapis.com/auth/spreadsheets');
