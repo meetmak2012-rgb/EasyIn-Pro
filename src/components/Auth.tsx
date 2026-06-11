@@ -70,6 +70,18 @@ export const Auth: React.FC<AuthProps> = ({ onLogin }) => {
     }
   };
 
+  const handleGuestLogin = () => {
+    const guestUser: UserType = {
+      id: "local_guest",
+      username: "Guest User",
+      businessName: "Guest Business",
+      createdAt: new Date().toISOString()
+    };
+    onLogin(guestUser);
+  };
+
+  const isUnauthorizedDomain = error.toLowerCase().includes('unauthorized-domain') || error.toLowerCase().includes('unauthorized') || error.toLowerCase().includes('auth-domain');
+
   return (
     <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6 relative overflow-hidden">
       <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-primary/10 rounded-full blur-[120px]"></div>
@@ -89,7 +101,18 @@ export const Auth: React.FC<AuthProps> = ({ onLogin }) => {
           </div>
 
           <div className="p-8 space-y-6">
-            {error && <div className="p-4 bg-rose-50 dark:bg-rose-900/20 border border-rose-100 dark:border-rose-900/30 text-rose-600 dark:text-rose-400 rounded-2xl text-[10px] font-black text-center uppercase tracking-widest">{error}</div>}
+            {error && (
+              <div className="p-4 bg-rose-50 dark:bg-rose-900/20 border border-rose-100 dark:border-rose-900/30 text-rose-600 dark:text-rose-400 rounded-2xl text-[10px] font-black text-center uppercase tracking-widest flex flex-col gap-2">
+                <span>{error}</span>
+                {isUnauthorizedDomain && (
+                  <span className="text-[9px] font-medium text-amber-700 dark:text-amber-400 normal-case leading-relaxed mt-2 border-t border-rose-100 dark:border-rose-900/10 pt-2 block">
+                    💡 <strong>Running from Netlify or custom URL?</strong> This web address is not registered under authorized domains in your Firebase console settings.
+                    <br />
+                    To bypass this and enter instantly, click the <strong>"Try as Guest"</strong> button below! All your data will save perfectly using local browser storage.
+                  </span>
+                )}
+              </div>
+            )}
 
             <form onSubmit={handleAuth} className="space-y-4">
               <div className="space-y-2">
@@ -142,6 +165,14 @@ export const Auth: React.FC<AuthProps> = ({ onLogin }) => {
                 />
               </svg>
               <span>Continue with Google</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleGuestLogin}
+              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-4 rounded-[1.5rem] transition-all font-black flex items-center justify-center gap-3 uppercase tracking-widest text-xs shadow-lg shadow-emerald-100 dark:shadow-none"
+            >
+              <span>Try as Guest (Offline Mode)</span>
             </button>
           </div>
         </div>
