@@ -152,7 +152,9 @@ const App: React.FC = () => {
           loadedTxns.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
           setTransactions(loadedTxns);
         } catch (error) {
-          handleFirestoreError(error, OperationType.GET, `users/${user.id}`);
+          console.error("Failed to load data from Firestore (using local storage fallback instead):", error);
+          const savedTxns = localStorage.getItem('easyin_transactions_v2');
+          if (savedTxns) setTransactions(JSON.parse(savedTxns));
         }
       };
       loadFirestoreData();
@@ -183,6 +185,9 @@ const App: React.FC = () => {
   };
 
   const handleSaveTransaction = async (transaction: Transaction) => {
+    let syncErrorOccurred = false;
+    let syncErrorMessage = "";
+
     if (user?.isGoogle) {
       const path = `users/${user.id}/transactions/${transaction.id}`;
       try {
@@ -193,8 +198,13 @@ const App: React.FC = () => {
           updatedAt: new Date().toISOString()
         };
         await setDoc(txnRef, completeTxn);
-      } catch (error) {
-        handleFirestoreError(error, OperationType.WRITE, path);
+      } catch (error: any) {
+        syncErrorOccurred = true;
+        try {
+          handleFirestoreError(error, OperationType.WRITE, path);
+        } catch (wrappedErr: any) {
+          syncErrorMessage = wrappedErr.message || String(wrappedErr);
+        }
       }
     }
 
@@ -205,22 +215,41 @@ const App: React.FC = () => {
     }
     setViewState('list');
     setEditingTransaction(null);
+
+    if (syncErrorOccurred) {
+      alert(`⚠️ Saved locally, but failed to sync to Firebase Cloud. Your estimates are fully saved on this device via Local Storage.\n\nDiagnostic Info:\n${syncErrorMessage}\n\nIf you are on a custom domain, please ensure you have registered it under 'Authorized Domains' in your Firebase console settings.`);
+    }
   };
 
   const handleDeleteTransaction = async (id: string) => {
+    let syncErrorOccurred = false;
+    let syncErrorMessage = "";
+
     if (user?.isGoogle) {
       const path = `users/${user.id}/transactions/${id}`;
       try {
         await deleteDoc(doc(db, 'users', user.id, 'transactions', id));
-      } catch (error) {
-        handleFirestoreError(error, OperationType.DELETE, path);
+      } catch (error: any) {
+        syncErrorOccurred = true;
+        try {
+          handleFirestoreError(error, OperationType.DELETE, path);
+        } catch (wrappedErr: any) {
+          syncErrorMessage = wrappedErr.message || String(wrappedErr);
+        }
       }
     }
     setTransactions(prev => prev.filter(t => t.id !== id));
+
+    if (syncErrorOccurred) {
+      alert(`⚠️ Deleted locally, but Cloud sync deletion failed:\n${syncErrorMessage}`);
+    }
   };
 
   const handleUpdateProfile = async (updatedProfile: BusinessProfile) => {
     setBusinessProfile(updatedProfile);
+    let syncErrorOccurred = false;
+    let syncErrorMessage = "";
+
     if (user?.isGoogle) {
       const path = `users/${user.id}/profile/settings`;
       try {
@@ -229,9 +258,18 @@ const App: React.FC = () => {
           ...updatedProfile,
           updatedAt: new Date().toISOString()
         });
-      } catch (error) {
-        handleFirestoreError(error, OperationType.WRITE, path);
+      } catch (error: any) {
+        syncErrorOccurred = true;
+        try {
+          handleFirestoreError(error, OperationType.WRITE, path);
+        } catch (wrappedErr: any) {
+          syncErrorMessage = wrappedErr.message || String(wrappedErr);
+        }
       }
+    }
+
+    if (syncErrorOccurred) {
+      alert(`⚠️ Profile updated locally, but Cloud sync failed:\n${syncErrorMessage}`);
     }
   };
 
