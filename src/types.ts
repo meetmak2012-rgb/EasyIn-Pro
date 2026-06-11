@@ -16,6 +16,15 @@ export interface LineItem {
   amount: number;
 }
 
+export interface CloudAttachment {
+  id: string;
+  name: string;
+  url: string;
+  contentType: string;
+  size: number;
+  uploadedAt: string;
+}
+
 export interface BusinessProfile {
   businessName: string;
   currencySymbol: string;
@@ -33,6 +42,7 @@ export interface BusinessProfile {
   lastCloudSync?: string;
   googleClientId?: string;
   oneDriveClientId?: string;
+  logoUrl?: string;
 }
 
 export interface Transaction {
@@ -46,12 +56,15 @@ export interface Transaction {
   subTotal: number;
   grandTotal: number;
   status: 'PAID' | 'UNPAID';
+  attachments?: CloudAttachment[];
 }
 
 export interface User {
   id: string;
   username: string;
-  password: string;
+  password?: string;
   businessName: string;
   createdAt: string;
+  isGoogle?: boolean;
+  email?: string;
 }

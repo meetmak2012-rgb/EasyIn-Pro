@@ -2,6 +2,9 @@
 import React, { useState } from 'react';
 import { LogIn, UserPlus } from 'lucide-react';
 import { User as UserType } from '../types';
+import { auth, googleProvider } from '../firebase';
+import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { setGoogleAccessToken } from '../services/googleDriveService';
 
 interface AuthProps {
   onLogin: (user: UserType) => void;
@@ -37,6 +40,33 @@ export const Auth: React.FC<AuthProps> = ({ onLogin }) => {
       };
       localStorage.setItem('easyin_users', JSON.stringify([...storedUsers, newUser]));
       onLogin(newUser);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    setError('');
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      const googleUser = result.user;
+      
+      const credential = GoogleAuthProvider.credentialFromResult(result);
+      if (credential?.accessToken) {
+        setGoogleAccessToken(credential.accessToken);
+      }
+      
+      const sessionUser: UserType = {
+        id: googleUser.uid,
+        username: googleUser.displayName || googleUser.email?.split('@')[0] || 'Google User',
+        businessName: googleUser.displayName ? `${googleUser.displayName}'s Firm` : 'My Printing Press',
+        createdAt: googleUser.metadata.creationTime || new Date().toISOString(),
+        isGoogle: true,
+        email: googleUser.email || ''
+      };
+      
+      onLogin(sessionUser);
+    } catch (err: any) {
+      console.error('Google Login Error:', err);
+      setError(err.message || 'Failed to authenticate with Google');
     }
   };
 
@@ -81,6 +111,38 @@ export const Auth: React.FC<AuthProps> = ({ onLogin }) => {
                 {isLogin ? 'Enter Dashboard' : 'Create My Business'}
               </button>
             </form>
+
+            <div className="relative flex py-2 items-center">
+              <div className="flex-grow border-t border-slate-200 dark:border-slate-800"></div>
+              <span className="flex-shrink mx-4 text-slate-400 text-[9px] font-black uppercase tracking-widest">OR</span>
+              <div className="flex-grow border-t border-slate-200 dark:border-slate-800"></div>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleGoogleLogin}
+              className="w-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100 py-4 rounded-[1.5rem] transition-all font-black flex items-center justify-center gap-3 uppercase tracking-widest text-xs border border-slate-200 dark:border-slate-700"
+            >
+              <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
+                <path
+                  fill="#EA4335"
+                  d="M5.266 9.765A7.077 7.077 0 0112 4.909c1.69 0 3.218.6 4.418 1.582L19.91 3C17.782 1.145 15.055 0 12 0 7.37 0 3.383 2.664 1.455 6.559l3.81 3.206z"
+                />
+                <path
+                  fill="#4285F4"
+                  d="M23.64 12.218c0-.79-.07-1.54-.19-2.27H12v4.51h6.55c-.29 1.48-1.14 2.73-2.4 3.56l3.7 2.87c2.16-1.98 3.79-4.9 3.79-8.67z"
+                />
+                <path
+                  fill="#FBBC05"
+                  d="M1.455 6.559c-.27.81-.425 1.68-.425 2.583 0 .93.16 1.83.455 2.66l3.81-3.21a6.6 6.6 0 010-4.066l-3.84-2.967H1.455z"
+                />
+                <path
+                  fill="#34A853"
+                  d="M12 24c3.24 0 5.97-1.07 7.96-2.91l-3.7-2.87c-1.08.72-2.47 1.16-4.26 1.16-3.28 0-6.07-2.21-7.07-5.18l-3.83 2.97C3.04 21.05 7.15 24 12 24z"
+                />
+              </svg>
+              <span>Continue with Google</span>
+            </button>
           </div>
         </div>
         <p className="text-center text-slate-500 text-[9px] font-black uppercase tracking-[0.2em]">Offline First • Data Stored Locally on this Device</p>

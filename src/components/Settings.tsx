@@ -2,10 +2,12 @@
 import React, { useState, useEffect } from 'react';
 import { 
   FileCheck, 
-  Layers, Trash2, Plus, FileText, ToggleLeft, ToggleRight, Palette, ShieldAlert, Building2, Eye, EyeOff
+  Layers, Trash2, Plus, FileText, ToggleLeft, ToggleRight, Palette, ShieldAlert, Building2, Eye, EyeOff, UploadCloud, Loader2
 } from 'lucide-react';
 import { User, BusinessProfile } from '../types';
 import { ConfirmationModal } from './ConfirmationModal';
+import { storage } from '../firebase';
+import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage';
 
 interface SettingsProps {
   profile: BusinessProfile;
@@ -35,9 +37,79 @@ export const Settings: React.FC<SettingsProps> = ({ profile, user, onUpdate, onU
   const [showPassword, setShowPassword] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
+  const [logoUploading, setLogoUploading] = useState(false);
+  const [logoProgress, setLogoProgress] = useState(0);
+  const [logoError, setLogoError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setFormData(profile);
+  }, [profile]);
+
   useEffect(() => {
     setUserData(user);
   }, [user]);
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!user || !user.isGoogle) {
+      setLogoError("Please sign in with Google to use Cloud Storage.");
+      return;
+    }
+
+    if (!file.type.startsWith('image/')) {
+      setLogoError("Please upload an image file (PNG/JPG).");
+      return;
+    }
+
+    setLogoUploading(true);
+    setLogoProgress(0);
+    setLogoError(null);
+
+    try {
+      const gcsRef = ref(storage, `users/${user.id}/logos/logo_${Date.now()}_${file.name}`);
+      const uploadTask = uploadBytesResumable(gcsRef, file);
+
+      uploadTask.on('state_changed', 
+        (snapshot) => {
+          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          setLogoProgress(Math.round(progress));
+        }, 
+        (err) => {
+          console.error("Storage upload error:", err);
+          setLogoError(err.message);
+          setLogoUploading(false);
+        }, 
+        async () => {
+          const downloadUrl = await getDownloadURL(uploadTask.snapshot.ref);
+          setFormData(prev => ({ ...prev, logoUrl: downloadUrl }));
+          setLogoUploading(false);
+          setIsSaved(false);
+        }
+      );
+    } catch (err: any) {
+      console.error(err);
+      setLogoError(err.message || "Upload failed");
+      setLogoUploading(false);
+    }
+  };
+
+  const handleRemoveLogo = async () => {
+    if (!formData.logoUrl) return;
+    
+    if (formData.logoUrl.includes('firebasestorage.googleapis.com')) {
+      try {
+        const fileRef = ref(storage, formData.logoUrl);
+        await deleteObject(fileRef);
+      } catch (err) {
+        console.warn("Failed to delete from GCS:", err);
+      }
+    }
+    
+    setFormData(prev => ({ ...prev, logoUrl: undefined }));
+    setIsSaved(false);
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target as HTMLInputElement;
@@ -152,6 +224,73 @@ export const Settings: React.FC<SettingsProps> = ({ profile, user, onUpdate, onU
                   placeholder="your_client_id_here"
                 />
                 <p className="text-[10px] text-slate-500 italic">Required for OneDrive backup. Get this from Azure Portal.</p>
+             </div>
+
+             {/* Company Logo Section - Google Cloud Storage */}
+             <div className="space-y-2 pt-6 border-t border-slate-100 dark:border-slate-800">
+                <label className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block font-bold">Company Logo (Google Cloud Storage)</label>
+                
+                {formData.logoUrl ? (
+                  <div className="flex items-center gap-4 p-4 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
+                    <img 
+                      src={formData.logoUrl} 
+                      alt="Business logo" 
+                      className="h-16 w-32 object-contain bg-white rounded p-1.5 border border-slate-200 dark:border-slate-850" 
+                      referrerPolicy="no-referrer" 
+                    />
+                    <div className="flex-1">
+                      <p className="text-xs font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider">Logo Uploaded Successfully</p>
+                      <p className="text-[10px] text-slate-500 font-medium">Stored in Google Cloud Storage. Ready for estimate PDFs.</p>
+                    </div>
+                    <button 
+                      type="button" 
+                      onClick={handleRemoveLogo}
+                      className="p-2 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/20 rounded-lg transition-colors cursor-pointer"
+                      title="Delete Image"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="relative group">
+                    <div className="border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl p-6 text-center hover:border-primary transition-all bg-slate-50/50 dark:bg-slate-900/50">
+                      <input 
+                        type="file" 
+                        accept="image/*"
+                        onChange={handleLogoUpload}
+                        disabled={logoUploading}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                      />
+                      <div className="space-y-2">
+                        {logoUploading ? (
+                          <div className="flex flex-col items-center gap-2">
+                            <Loader2 className="animate-spin text-primary" size={24} />
+                            <p className="text-xs font-black text-slate-700 dark:text-slate-300">Uploading to Cloud Storage... {logoProgress}%</p>
+                            <div className="w-48 bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden">
+                              <div className="bg-primary h-full transition-all duration-300" style={{ width: `${logoProgress}%` }} />
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex flex-col items-center gap-2">
+                            <div className="p-3 bg-slate-100 dark:bg-slate-800 rounded-full text-slate-400 group-hover:text-primary transition-colors">
+                              <UploadCloud size={24} />
+                            </div>
+                            <div>
+                              <p className="text-xs font-black text-slate-700 dark:text-slate-300">Click or Drag Image to upload Logo</p>
+                              <p className="text-[10px] text-slate-400 mt-1 uppercase tracking-widest font-bold">PNG, JPG or SVG up to 5MB</p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {logoError && <p className="text-[10px] font-black text-rose-500 uppercase tracking-widest leading-loose mt-2">{logoError}</p>}
+                {!user?.isGoogle && (
+                  <p className="text-[9px] font-black text-blue-500 dark:text-blue-400 uppercase tracking-wider bg-blue-50 dark:bg-blue-950/20 p-2.5 rounded-lg border border-blue-100 dark:border-blue-950/30 mt-2">
+                    💡 Please Log in with Google to enable secure enterprise Cloud Storage for your logo and transaction files!
+                  </p>
+                )}
              </div>
           </div>
         </div>

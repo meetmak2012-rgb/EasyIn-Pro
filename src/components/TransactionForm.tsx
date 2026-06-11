@@ -1,17 +1,20 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { Plus, Trash2, ArrowLeft, Eye, EyeOff, Save, Tag } from 'lucide-react';
-import { LineItem, Transaction, TransactionType, BusinessProfile } from '../types';
+import { Plus, Trash2, ArrowLeft, Eye, EyeOff, Save, Tag, UploadCloud, Paperclip, Loader2 } from 'lucide-react';
+import { LineItem, Transaction, TransactionType, BusinessProfile, User, CloudAttachment } from '../types';
 import { InvoicePreview } from './InvoicePreview';
+import { storage } from '../firebase';
+import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage';
 
 interface TransactionFormProps {
   onSave: (transaction: Transaction) => void;
   onCancel: () => void;
   initialData?: Transaction | null;
   profile: BusinessProfile;
+  user?: User;
 }
 
-export const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCancel, initialData, profile }) => {
+export const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCancel, initialData, profile, user }) => {
   const [partyName, setPartyName] = useState('');
   const [billingAddress, setBillingAddress] = useState('');
   const [invoiceNumber, setInvoiceNumber] = useState('');
@@ -23,6 +26,11 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCanc
   const [showPreview, setShowPreview] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const [attachments, setAttachments] = useState<CloudAttachment[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
   const CURRENCY_SYMBOL = profile.currencySymbol === '₹' ? '₹' : profile.currencySymbol;
 
   useEffect(() => {
@@ -33,9 +41,11 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCanc
       setDate(initialData.date);
       setItems(initialData.items);
       setStatus(initialData.status);
+      setAttachments(initialData.attachments || []);
     } else {
       setInvoiceNumber(`EST-${Math.floor(1000 + Math.random() * 9000)}`);
       setStatus(profile.defaultStatus || 'UNPAID');
+      setAttachments([]);
     }
   }, [initialData, profile.defaultStatus]);
 
@@ -69,6 +79,79 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCanc
     return { subTotal, grandTotal: subTotal };
   }, [items]);
 
+  const handleAttachmentUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!user || !user.isGoogle) {
+      setUploadError("Please login with Google to enable secure GCS attachments upload.");
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      setUploadError("Max file size limit is 10MB per attachment.");
+      return;
+    }
+
+    setUploading(true);
+    setUploadProgress(0);
+    setUploadError(null);
+
+    const txId = initialData?.id || `draft_${Date.now()}`;
+
+    try {
+      const gcsPath = `users/${user.id}/transactions/${txId}/attachments/${Date.now()}_${file.name}`;
+      const storageRef = ref(storage, gcsPath);
+      const uploadTask = uploadBytesResumable(storageRef, file);
+
+      uploadTask.on('state_changed',
+        (snapshot) => {
+          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          setUploadProgress(Math.round(progress));
+        },
+        (err) => {
+          console.error("GCS Attachment error:", err);
+          setUploadError(err.message || "File upload failed.");
+          setUploading(false);
+        },
+        async () => {
+          const downloadUrl = await getDownloadURL(uploadTask.snapshot.ref);
+          const newAttachment: CloudAttachment = {
+            id: Date.now().toString(),
+            name: file.name,
+            url: downloadUrl,
+            contentType: file.type || 'application/octet-stream',
+            size: file.size,
+            uploadedAt: new Date().toISOString()
+          };
+          setAttachments(prev => [...prev, newAttachment]);
+          setUploading(false);
+          setUploadProgress(0);
+        }
+      );
+    } catch (err: any) {
+      console.error(err);
+      setUploadError(err.message || "An unexpected error occurred during upload.");
+      setUploading(false);
+    }
+  };
+
+  const handleRemoveAttachment = async (id: string) => {
+    const itemToRemove = attachments.find(a => a.id === id);
+    if (!itemToRemove) return;
+
+    if (itemToRemove.url.includes('firebasestorage.googleapis.com')) {
+      try {
+        const fileRef = ref(storage, itemToRemove.url);
+        await deleteObject(fileRef);
+      } catch (err) {
+        console.warn("Failed to delete from GCS:", err);
+      }
+    }
+
+    setAttachments(prev => prev.filter(a => a.id !== id));
+  };
+
   const handleSave = () => {
     if (!partyName) { setError("Please enter Customer Name"); return; }
     if (!invoiceNumber) { setError("Please enter Estimate Number"); return; }
@@ -81,7 +164,8 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCanc
       billingAddress,
       items,
       ...totals,
-      status
+      status,
+      attachments
     });
   };
 
@@ -178,6 +262,97 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCanc
                 className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:border-primary focus:bg-white dark:focus:bg-slate-900 outline-none text-sm min-h-[60px] resize-none font-medium text-slate-900 dark:text-slate-100"
                 placeholder="Optional address or terms..."
               />
+            </div>
+
+            {/* Document Attachments - Google Cloud Storage */}
+            <div className="space-y-3 pt-6 border-t border-slate-100 dark:border-slate-800">
+              <div className="flex justify-between items-center">
+                <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest block font-bold">Document Attachments (Google Cloud Storage)</label>
+                {attachments.length > 0 && (
+                  <span className="text-[9px] font-black text-primary uppercase tracking-widest bg-primary/10 px-2 py-0.5 rounded-full">
+                    {attachments.length} {attachments.length === 1 ? 'file' : 'files'}
+                  </span>
+                )}
+              </div>
+
+              {/* Upload Drop Zone / Input */}
+              <div className="relative group">
+                <div className="border border-dashed border-slate-200 dark:border-slate-800 rounded-xl p-4 text-center hover:border-primary transition-all bg-slate-50/50 dark:bg-slate-900/50">
+                  <input 
+                    type="file" 
+                    onChange={handleAttachmentUpload}
+                    disabled={uploading}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                  />
+                  {uploading ? (
+                    <div className="flex flex-col items-center gap-1.5 py-1">
+                      <Loader2 className="animate-spin text-primary" size={18} />
+                      <p className="text-xs font-black text-slate-700 dark:text-slate-300">Uploading to GCS... {uploadProgress}%</p>
+                      <div className="w-40 bg-slate-200 dark:bg-slate-700 h-1 rounded-full overflow-hidden">
+                        <div className="bg-primary h-full transition-all duration-300" style={{ width: `${uploadProgress}%` }} />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center gap-1">
+                      <div className="flex items-center gap-2 text-slate-500 group-hover:text-primary transition-colors">
+                        <UploadCloud size={18} />
+                        <span className="text-xs font-black text-slate-700 dark:text-slate-300">Upload Attachments to Cloud</span>
+                      </div>
+                      <p className="text-[9px] text-slate-400 uppercase tracking-widest">PDFs, Images, Receipts up to 10MB</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* List of Attachments */}
+              {attachments.length > 0 && (
+                <div className="space-y-2 max-h-[200px] overflow-y-auto custom-scrollbar pt-1">
+                  {attachments.map((file) => (
+                    <div key={file.id} className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-primary/30 transition-all">
+                      <div className="p-2 bg-slate-100 dark:bg-slate-800 rounded-lg text-slate-500 shrink-0">
+                        {file.contentType.startsWith('image/') ? (
+                          <img src={file.url} alt={file.name} className="w-5 h-5 object-cover rounded" referrerPolicy="no-referrer" />
+                        ) : (
+                          <Paperclip size={16} />
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-bold text-slate-900 dark:text-slate-100 truncate">{file.name}</p>
+                        <p className="text-[9px] text-slate-400 dark:text-slate-500 uppercase tracking-wider font-extrabold flex gap-2">
+                          <span>{(file.size / 1024 / 1024).toFixed(2)} MB</span>
+                          <span className="text-slate-300 dark:text-slate-705">•</span>
+                          <span>Uploaded {new Date(file.uploadedAt).toLocaleDateString()}</span>
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <a 
+                          href={file.url} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400 hover:text-primary transition-all"
+                          title="View File"
+                        >
+                          <Eye size={14} />
+                        </a>
+                        <button 
+                          type="button" 
+                          onClick={() => handleRemoveAttachment(file.id)}
+                          className="p-1.5 hover:bg-rose-50 dark:hover:bg-rose-950/20 rounded-lg text-slate-400 hover:text-rose-600 transition-all cursor-pointer"
+                          title="Remove File"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {uploadError && <p className="text-[10px] font-black text-rose-500 uppercase tracking-widest mt-1 leading-normal">{uploadError}</p>}
+              {!user?.isGoogle && (
+                <p className="text-[9px] font-black text-blue-500 dark:text-blue-400 uppercase tracking-wider bg-blue-50 dark:bg-blue-950/20 p-2.5 rounded-lg border border-blue-100 dark:border-blue-950/30 mt-2">
+                  💡 Please Log in with Google to enable secure GCS file uploads for estimate attachments!
+                </p>
+              )}
             </div>
 
             <div className="space-y-6">

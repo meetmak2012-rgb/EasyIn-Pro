@@ -1,8 +1,8 @@
 
 import React, { useRef, useState, useEffect } from 'react';
 import { Download, Upload, ShieldCheck, History, RefreshCcw, Cloud } from 'lucide-react';
-import { Transaction, BusinessProfile } from '../types';
-import { syncToDrive, restoreFromDrive, initGapi } from '../services/googleDriveService';
+import { Transaction, BusinessProfile, User } from '../types';
+import { syncToDrive, restoreFromDrive } from '../services/googleDriveService';
 import { syncToOneDrive, restoreFromOneDrive } from '../services/oneDriveService';
 import { exportTransactionsToExcel } from '../utils/excelExporter';
 
@@ -10,9 +10,10 @@ interface DataManagementProps {
   transactions: Transaction[];
   onImport: (data: Transaction[]) => void;
   profile: BusinessProfile;
+  user?: User | null;
 }
 
-export const DataManagement: React.FC<DataManagementProps> = ({ transactions, onImport, profile }) => {
+export const DataManagement: React.FC<DataManagementProps> = ({ transactions, onImport, profile, user }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [lastAutoBackup, setLastAutoBackup] = useState<string | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
@@ -21,9 +22,6 @@ export const DataManagement: React.FC<DataManagementProps> = ({ transactions, on
   useEffect(() => {
     const last = localStorage.getItem('easyin_last_autobackup');
     if (last) setLastAutoBackup(new Date(last).toLocaleString());
-    
-    // Initialize GAPI
-    initGapi().catch(console.error);
   }, []);
 
   const handleBackup = () => {
@@ -39,41 +37,33 @@ export const DataManagement: React.FC<DataManagementProps> = ({ transactions, on
   };
 
   const handleCloudSync = async () => {
-    if (!profile.googleClientId) {
-      alert("Google Client ID not configured. Please set it in Settings.");
-      return;
-    }
-
     setIsSyncing(true);
     try {
-      await syncToDrive(transactions, profile.googleClientId);
-      alert('Data synced to Google Drive successfully!');
-    } catch {
-      alert('Failed to sync to Google Drive. Check console for details.');
+      await syncToDrive(transactions);
+      alert('Estimates synced to Google Drive successfully!');
+    } catch (err: any) {
+      console.error(err);
+      alert('Failed to sync to Google Drive: ' + (err.message || 'Check console for details.'));
     } finally {
       setIsSyncing(false);
     }
   };
 
   const handleCloudRestore = async () => {
-    if (!profile.googleClientId) {
-      alert("Google Client ID not configured. Please set it in Settings.");
-      return;
-    }
-
     if (!window.confirm('Restore from Google Drive? This will replace your current data.')) return;
 
     setIsSyncing(true);
     try {
-      const data = await restoreFromDrive(profile.googleClientId);
+      const data = await restoreFromDrive();
       if (data) {
         onImport(data);
-        alert('Data restored from Google Drive successfully!');
+        alert('Estimates restored from Google Drive successfully!');
       } else {
         alert('No backup found on Google Drive.');
       }
-    } catch {
-      alert('Failed to restore from Google Drive.');
+    } catch (err: any) {
+      console.error(err);
+      alert('Failed to restore from Google Drive: ' + (err.message || 'Check console for details.'));
     } finally {
       setIsSyncing(false);
     }
@@ -239,7 +229,11 @@ export const DataManagement: React.FC<DataManagementProps> = ({ transactions, on
              </div>
              <div className="space-y-1">
                 <h3 className="text-sm font-black text-blue-900 uppercase tracking-wider">Google Drive</h3>
-                <p className="text-xs text-slate-500 leading-relaxed">Sync your estimates to Google Drive.</p>
+                <p className="text-xs text-slate-500 leading-relaxed">
+                  {user?.isGoogle 
+                    ? `Linked: ${user.username}` 
+                    : "Sync your estimates to Google Drive."}
+                </p>
              </div>
              <div className="flex gap-2 w-full">
                <button 

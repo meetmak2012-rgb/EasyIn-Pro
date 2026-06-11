@@ -1,0 +1,65 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Primitive Helpers
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Validation Blueprints
+    function isValidUserProfile(data) {
+      return data.keys().hasAll(['businessName']) &&
+             data.businessName is string &&
+             data.businessName.size() <= 200;
+    }
+
+    function isValidTransaction(data, authUserId) {
+      return data.keys().hasAll(['id', 'type', 'invoiceNumber', 'date', 'partyName', 'items', 'subTotal', 'grandTotal', 'status', 'userId']) &&
+             data.id is string &&
+             data.invoiceNumber is string &&
+             data.partyName is string &&
+             data.userId == authUserId &&
+             data.type == 'SALE' &&
+             (data.status == 'PAID' || data.status == 'UNPAID');
+    }
+
+    // Match rules
+    match /users/{userId} {
+      
+      match /profile/settings {
+        allow read: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidUserProfile(incoming());
+        allow delete: if isOwner(userId);
+      }
+
+      match /transactions/{transactionId} {
+        allow read, list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidTransaction(incoming(), userId) && isValidId(transactionId);
+        allow update: if isOwner(userId) && isValidTransaction(incoming(), userId) && isValidId(transactionId);
+        allow delete: if isOwner(userId);
+      }
+    }
+  }
+}

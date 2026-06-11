@@ -3,19 +3,45 @@ import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import { Transaction, BusinessProfile } from "../types";
 
-export const generateInvoicePDF = (transaction: Transaction, profile: BusinessProfile) => {
+const loadImage = (url: string): Promise<HTMLImageElement> => {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => resolve(img);
+    img.onerror = (e) => reject(e);
+    img.src = url;
+  });
+};
+
+export const generateInvoicePDF = async (transaction: Transaction, profile: BusinessProfile) => {
   try {
     const doc = new jsPDF('p', 'mm', 'a4');
     const themeRGB: [number, number, number] = hexToRgb(profile.pdfThemeColor || "#2563eb");
     const currencyPrefix = profile.currencySymbol === '₹' ? 'Rs.' : profile.currencySymbol;
 
+    let topOffset = 25;
+
     // 1. Watermark Text
     doc.setFontSize(60).setTextColor(245, 245, 245).setFont('helvetica', 'bold');
-    doc.text("ESTIMATE", 196, 25, { align: 'right' });
+    doc.text("ESTIMATE", 196, topOffset, { align: 'right' });
+
+    // Add Logo if present
+    if (profile.logoUrl) {
+      try {
+        const img = await loadImage(profile.logoUrl);
+        const aspect = img.width / img.height;
+        const width = 16 * aspect;
+        const limitWidth = width > 35 ? 35 : width;
+        doc.addImage(img, 'PNG', 14, 12, limitWidth, 16);
+        topOffset = topOffset + 8; // Adjust water mark down if needed
+      } catch (err) {
+        console.warn("Could not load logo image for PDF:", err);
+      }
+    }
 
     // 2. Main Title
-    doc.setFontSize(28).setTextColor(themeRGB[0], themeRGB[1], themeRGB[2]).setFont('helvetica', 'bold');
-    doc.text("ESTIMATE", 14, 25);
+    doc.setFontSize(24).setTextColor(themeRGB[0], themeRGB[1], themeRGB[2]).setFont('helvetica', 'bold');
+    doc.text(profile.businessName || "ESTIMATE", profile.logoUrl ? 14 : 14, profile.logoUrl ? 36 : 25);
     
     // Subtitle "OFFICIAL RECORD" removed as per user request
 

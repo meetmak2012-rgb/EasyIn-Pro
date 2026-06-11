@@ -10,6 +10,56 @@ import { Settings } from './components/Settings';
 import { UnitConverter } from './components/UnitConverter';
 import { Auth } from './components/Auth';
 import { Transaction, BusinessProfile, TransactionType, User } from './types';
+import { db, auth } from './firebase';
+import { signOut } from 'firebase/auth';
+import { collection, doc, getDoc, getDocs, setDoc, deleteDoc, getDocFromServer } from 'firebase/firestore';
+
+enum OperationType {
+  CREATE = 'create',
+  UPDATE = 'update',
+  DELETE = 'delete',
+  LIST = 'list',
+  GET = 'get',
+  WRITE = 'write',
+}
+
+interface FirestoreErrorInfo {
+  error: string;
+  operationType: OperationType;
+  path: string | null;
+  authInfo: {
+    userId?: string | null;
+    email?: string | null;
+    emailVerified?: boolean | null;
+    isAnonymous?: boolean | null;
+    tenantId?: string | null;
+    providerInfo?: {
+      providerId?: string | null;
+      email?: string | null;
+    }[];
+  }
+}
+
+function handleFirestoreError(error: unknown, operationType: OperationType, path: string | null) {
+  const errInfo: FirestoreErrorInfo = {
+    error: error instanceof Error ? error.message : String(error),
+    authInfo: {
+      userId: auth.currentUser?.uid,
+      email: auth.currentUser?.email,
+      emailVerified: auth.currentUser?.emailVerified,
+      isAnonymous: auth.currentUser?.isAnonymous,
+      tenantId: auth.currentUser?.tenantId,
+      providerInfo: auth.currentUser?.providerData?.map(provider => ({
+        providerId: provider.providerId,
+        email: provider.email,
+      })) || []
+    },
+    operationType,
+    path
+  };
+  console.error('Firestore Error: ', JSON.stringify(errInfo));
+  throw new Error(JSON.stringify(errInfo));
+}
 
 const DEFAULT_MATERIALS = [
   "Regular Flex", "B.B. Reg. Flex", "Star Flex", "Vinyl", "Vinyl + Lam",
@@ -41,6 +91,20 @@ const App: React.FC = () => {
   const [viewState, setViewState] = useState<'list' | 'form'>('list');
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
 
+  // Validate firestore connection initially
+  useEffect(() => {
+    async function testConnection() {
+      try {
+        await getDocFromServer(doc(db, 'test', 'connection'));
+      } catch (error) {
+        if (error instanceof Error && error.message.includes('the client is offline')) {
+          console.warn("Please check your Firebase configuration or internet connection.");
+        }
+      }
+    }
+    testConnection();
+  }, []);
+
   useEffect(() => {
     const savedUser = localStorage.getItem('easyin_current_user');
     if (savedUser) {
@@ -56,6 +120,44 @@ const App: React.FC = () => {
       setBusinessProfile({ ...DEFAULT_PROFILE, ...JSON.parse(savedProfile) });
     }
   }, []);
+
+  // Fetch Firestore transactions & profile settings when Google User logs in
+  useEffect(() => {
+    if (user && user.isGoogle) {
+      const loadFirestoreData = async () => {
+        try {
+          // 1. Fetch user settings profile
+          const profilePath = `users/${user.id}/profile/settings`;
+          const profileRef = doc(db, profilePath);
+          const profileSnap = await getDoc(profileRef);
+          if (profileSnap.exists()) {
+            setBusinessProfile(profileSnap.data() as BusinessProfile);
+          } else {
+            const initialProfile = {
+              ...DEFAULT_PROFILE,
+              businessName: user.businessName
+            };
+            await setDoc(profileRef, initialProfile);
+            setBusinessProfile(initialProfile);
+          }
+
+          // 2. Fetch user transactions
+          const txnsPath = `users/${user.id}/transactions`;
+          const txnsQuery = collection(db, txnsPath);
+          const querySnapshot = await getDocs(txnsQuery);
+          const loadedTxns: Transaction[] = [];
+          querySnapshot.forEach((doc) => {
+            loadedTxns.push(doc.data() as Transaction);
+          });
+          loadedTxns.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+          setTransactions(loadedTxns);
+        } catch (error) {
+          handleFirestoreError(error, OperationType.GET, `users/${user.id}`);
+        }
+      };
+      loadFirestoreData();
+    }
+  }, [user]);
 
   useEffect(() => {
     if (user) localStorage.setItem('easyin_current_user', JSON.stringify(user));
@@ -80,7 +182,22 @@ const App: React.FC = () => {
     setBusinessProfile(prev => ({ ...prev, businessName: u.businessName }));
   };
 
-  const handleSaveTransaction = (transaction: Transaction) => {
+  const handleSaveTransaction = async (transaction: Transaction) => {
+    if (user?.isGoogle) {
+      const path = `users/${user.id}/transactions/${transaction.id}`;
+      try {
+        const txnRef = doc(db, 'users', user.id, 'transactions', transaction.id);
+        const completeTxn = {
+          ...transaction,
+          userId: user.id,
+          updatedAt: new Date().toISOString()
+        };
+        await setDoc(txnRef, completeTxn);
+      } catch (error) {
+        handleFirestoreError(error, OperationType.WRITE, path);
+      }
+    }
+
     if (editingTransaction) {
       setTransactions(prev => prev.map(t => t.id === transaction.id ? transaction : t));
     } else {
@@ -88,6 +205,34 @@ const App: React.FC = () => {
     }
     setViewState('list');
     setEditingTransaction(null);
+  };
+
+  const handleDeleteTransaction = async (id: string) => {
+    if (user?.isGoogle) {
+      const path = `users/${user.id}/transactions/${id}`;
+      try {
+        await deleteDoc(doc(db, 'users', user.id, 'transactions', id));
+      } catch (error) {
+        handleFirestoreError(error, OperationType.DELETE, path);
+      }
+    }
+    setTransactions(prev => prev.filter(t => t.id !== id));
+  };
+
+  const handleUpdateProfile = async (updatedProfile: BusinessProfile) => {
+    setBusinessProfile(updatedProfile);
+    if (user?.isGoogle) {
+      const path = `users/${user.id}/profile/settings`;
+      try {
+        const profileRef = doc(db, 'users', user.id, 'profile', 'settings');
+        await setDoc(profileRef, {
+          ...updatedProfile,
+          updatedAt: new Date().toISOString()
+        });
+      } catch (error) {
+        handleFirestoreError(error, OperationType.WRITE, path);
+      }
+    }
   };
 
   const handleNavigation = (tab: string) => {
@@ -117,6 +262,7 @@ const App: React.FC = () => {
               profile={businessProfile}
               onSave={handleSaveTransaction}
               onCancel={() => {setViewState('list'); setEditingTransaction(null);}}
+              user={user || undefined}
             />
           );
         }
@@ -125,18 +271,18 @@ const App: React.FC = () => {
             transactions={transactions.filter(t => t.type === TransactionType.SALE)}
             onAdd={() => {setEditingTransaction(null); setViewState('form');}}
             onEdit={(t) => {setEditingTransaction(t); setViewState('form');}}
-            onDelete={(id) => setTransactions(prev => prev.filter(t => t.id !== id))}
+            onDelete={handleDeleteTransaction}
             profile={businessProfile}
           />
         );
 
       case 'reports': return <Reports transactions={transactions} />;
       case 'converter': return <UnitConverter />;
-      case 'data': return <DataManagement transactions={transactions} onImport={setTransactions} profile={businessProfile} />;
+      case 'data': return <DataManagement transactions={transactions} onImport={setTransactions} profile={businessProfile} user={user} />;
       case 'settings': return <Settings 
         profile={businessProfile} 
         user={user!} 
-        onUpdate={setBusinessProfile} 
+        onUpdate={handleUpdateProfile} 
         onUpdateUser={(updatedUser) => {
             console.log('Updating user:', updatedUser);
             const storedUsers: User[] = JSON.parse(localStorage.getItem('easyin_users') || '[]');
@@ -150,8 +296,28 @@ const App: React.FC = () => {
             console.log('Updated users array:', updatedUsers);
             localStorage.setItem('easyin_users', JSON.stringify(updatedUsers));
         }}
-        onLogout={() => setUser(null)}
-        onDeleteAccount={() => {
+        onLogout={() => {
+            if (user?.isGoogle) {
+                signOut(auth).catch(err => console.error('Sign out error:', err));
+            }
+            setUser(null);
+            setTransactions([]);
+            setBusinessProfile(DEFAULT_PROFILE);
+        }}
+        onDeleteAccount={async () => {
+            if (user?.isGoogle) {
+              try {
+                // Delete setting profile
+                await deleteDoc(doc(db, 'users', user.id, 'profile', 'settings'));
+                // Delete all transactions from DB
+                for (const t of transactions) {
+                  await deleteDoc(doc(db, 'users', user.id, 'transactions', t.id));
+                }
+                await signOut(auth);
+              } catch (err) {
+                console.error('Failed to purge cloud documents:', err);
+              }
+            }
             setUser(null);
             setTransactions([]);
             setBusinessProfile(DEFAULT_PROFILE);

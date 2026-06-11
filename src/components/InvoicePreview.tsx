@@ -13,9 +13,19 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({ transaction, pro
   return (
     <div className="w-[210mm] min-h-[297mm] bg-white p-12 shadow-2xl font-sans text-slate-900">
       <div className="flex justify-between items-start border-b-2 border-slate-900 pb-8">
-        <div>
-          <h1 className="text-4xl font-black uppercase tracking-tighter text-slate-900">{profile.businessName}</h1>
-          <p className="text-xs font-bold text-slate-500 mt-1 uppercase tracking-widest">Sales Estimate / Quotation</p>
+        <div className="flex items-center gap-5">
+          {profile.logoUrl && (
+            <img 
+              src={profile.logoUrl} 
+              alt="Business Logo" 
+              className="w-16 h-16 object-contain rounded p-1 border border-slate-100 bg-white" 
+              referrerPolicy="no-referrer"
+            />
+          )}
+          <div>
+            <h1 className="text-4xl font-black uppercase tracking-tighter text-slate-900">{profile.businessName}</h1>
+            <p className="text-xs font-bold text-slate-500 mt-1 uppercase tracking-widest">Sales Estimate / Quotation</p>
+          </div>
         </div>
         <div className="text-right">
           <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Estimate No.</p>

@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { 
-  Plus, Search, Filter, FileText, Download, Edit, Trash2, ClipboardCheck, XCircle, CheckCircle2, Clock, Tag
+  Plus, Search, Filter, FileText, Download, Edit, Trash2, ClipboardCheck, XCircle, CheckCircle2, Clock, Tag, Paperclip
 } from 'lucide-react';
 import { Transaction, BusinessProfile } from '../types';
 import { generateInvoicePDF } from '../utils/pdfGenerator';
@@ -140,7 +140,27 @@ export const TransactionList: React.FC<TransactionListProps> = ({ transactions, 
                   <tr key={t.id} className="hover:bg-slate-50/80 transition-colors group">
                     <td className="px-6 py-4 whitespace-nowrap text-xs font-bold text-slate-500">{new Date(t.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-xs font-black text-slate-900">{t.invoiceNumber}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-xs text-slate-900 font-bold">{t.partyName}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-xs">
+                      <div className="font-bold text-slate-900">{t.partyName}</div>
+                      {t.attachments && t.attachments.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5 mt-1.5">
+                          {t.attachments.map((file) => (
+                            <a 
+                              key={file.id}
+                              href={file.url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-slate-50 dark:bg-slate-800 hover:bg-blue-50 hover:text-blue-600 border border-slate-200/40 text-[9px] uppercase font-bold tracking-wider text-slate-500 transition-colors cursor-pointer"
+                              title={`${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`}
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <Paperclip size={10} />
+                              <span className="max-w-[70px] truncate">{file.name}</span>
+                            </a>
+                          ))}
+                        </div>
+                      )}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-xs text-slate-900 text-right font-black">₹{Number(t.grandTotal || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-center">
                       <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest border ${t.status === 'PAID' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-rose-50 text-rose-600 border-rose-100'}`}>
