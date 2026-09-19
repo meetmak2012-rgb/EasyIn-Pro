@@ -169,10 +169,10 @@ export const TransactionList: React.FC<TransactionListProps> = ({ transactions, 
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right">
-                      <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onClick={(e) => handleDownload(e, t)} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl" title="Download PDF"><Download size={16} /></button>
-                        <button onClick={() => onEdit(t)} className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl" title="Edit"><Edit size={16} /></button>
-                        <button onClick={() => window.confirm("Permanently delete this entry?") && onDelete(t.id)} className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl" title="Delete"><Trash2 size={16} /></button>
+                      <div className="flex justify-end gap-1.5 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+                        <button onClick={(e) => handleDownload(e, t)} className="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-xl" title="Download PDF"><Download size={16} /></button>
+                        <button onClick={() => onEdit(t)} className="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl" title="Edit"><Edit size={16} /></button>
+                        <button onClick={() => window.confirm("Permanently delete this entry?") && onDelete(t.id)} className="p-2 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-xl" title="Delete"><Trash2 size={16} /></button>
                       </div>
                     </td>
                   </tr>

@@ -66,5 +66,7 @@ export interface User {
   businessName: string;
   createdAt: string;
   isGoogle?: boolean;
+  isAnonymous?: boolean;
   email?: string;
+  photoURL?: string;
 }

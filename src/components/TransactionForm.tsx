@@ -152,21 +152,60 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCanc
     setAttachments(prev => prev.filter(a => a.id !== id));
   };
 
-  const handleSave = () => {
-    if (!partyName) { setError("Please enter Customer Name"); return; }
-    if (!invoiceNumber) { setError("Please enter Estimate Number"); return; }
-    onSave({
-      id: initialData?.id || Date.now().toString(),
-      type: TransactionType.SALE,
-      invoiceNumber,
-      date,
-      partyName,
-      billingAddress,
-      items,
-      ...totals,
-      status,
-      attachments
-    });
+  const [saving, setSaving] = useState(false);
+  const [touchedPartyName, setTouchedPartyName] = useState(false);
+  const [touchedInvoiceNumber, setTouchedInvoiceNumber] = useState(false);
+
+  const handleSave = async (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    if (saving) return;
+
+    setTouchedPartyName(true);
+    setTouchedInvoiceNumber(true);
+
+    const safePartyName = partyName.trim() || 'Walk-in Customer';
+    const safeInvoiceNumber = invoiceNumber.trim() || `EST-${Math.floor(1000 + Math.random() * 9000)}`;
+
+    setSaving(true);
+    setError(null);
+
+    try {
+      const sanitizedItems = items.map((it, idx) => ({
+        ...it,
+        id: it.id || `item_${idx}_${Date.now()}`,
+        description: it.description?.trim() || `Item ${idx + 1}`,
+        material: it.material || '',
+        details: it.details || '',
+        sizeA: Number(it.sizeA) || 0,
+        sizeB: Number(it.sizeB) || 0,
+        quantity: Number(it.quantity) || 1,
+        sqFt: Number(it.sqFt) || 0,
+        rate: Number(it.rate) || 0,
+        amount: Number(it.amount) || 0
+      }));
+
+      await onSave({
+        id: initialData?.id || `EST_${Date.now()}`,
+        type: TransactionType.SALE,
+        invoiceNumber: safeInvoiceNumber,
+        date,
+        partyName: safePartyName,
+        billingAddress: billingAddress.trim(),
+        items: sanitizedItems,
+        subTotal: Number(totals.subTotal) || 0,
+        grandTotal: Number(totals.grandTotal) || 0,
+        status,
+        attachments: attachments || []
+      });
+    } catch (saveErr: any) {
+      console.error("Save error:", saveErr);
+      setError(saveErr?.message || "Failed to save estimate.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -200,11 +239,13 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCanc
             {showPreview ? 'Hide Preview' : 'Show Preview'}
           </button>
           <button 
-            onClick={handleSave} 
-            className={`flex items-center gap-2 text-white px-8 py-2.5 rounded-xl transition-all font-black shadow-lg text-[10px] uppercase tracking-widest bg-primary hover:opacity-90 shadow-primary/20`}
+            type="button"
+            onClick={(e) => handleSave(e)} 
+            disabled={saving}
+            className={`flex items-center gap-2 text-white px-8 py-2.5 rounded-xl transition-all font-black shadow-lg text-[10px] uppercase tracking-widest bg-blue-600 hover:bg-blue-700 shadow-blue-600/20 disabled:opacity-50`}
           >
-            <Save size={14} />
-            Save Estimate
+            {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+            <span>{saving ? 'Saving...' : 'Save Estimate'}</span>
           </button>
         </div>
       </div>
@@ -212,25 +253,36 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCanc
       <div className="flex-1 flex overflow-hidden">
         <div className={`w-full ${showPreview ? 'lg:w-[40%] xl:w-[30%]' : 'max-w-3xl mx-auto'} overflow-y-auto bg-white dark:bg-slate-900 p-6 border-r border-slate-200 dark:border-slate-800 custom-scrollbar`}>
           <div className="space-y-8">
+            {error && (
+              <div className="p-3 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 rounded-xl text-xs font-bold animate-in fade-in">
+                ⚠️ {error}
+              </div>
+            )}
             <div className="grid grid-cols-1 gap-6">
               <div className="space-y-1.5">
-                <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Customer Name</label>
+                <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest flex items-center justify-between">
+                  <span>Customer Name</span>
+                  <span className="text-rose-500">*Required</span>
+                </label>
                 <input 
                   type="text" 
                   value={partyName} 
                   onChange={(e) => { setPartyName(e.target.value); setError(null); }} 
-                  className={`w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:border-primary focus:bg-white dark:focus:bg-slate-900 transition-all outline-none text-sm font-bold text-primary`} 
-                  placeholder="Customer Name" 
+                  className={`w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border ${touchedPartyName && !partyName.trim() ? 'border-rose-500 ring-2 ring-rose-500/20' : 'border-slate-200 dark:border-slate-700'} rounded-xl focus:border-blue-600 focus:bg-white dark:focus:bg-slate-900 transition-all outline-none text-sm font-bold text-slate-900 dark:text-slate-100`} 
+                  placeholder="Enter Customer Name" 
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Estimate No.</label>
+                <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest flex items-center justify-between">
+                  <span>Estimate No.</span>
+                  <span className="text-rose-500">*Required</span>
+                </label>
                 <input 
                   type="text" 
                   value={invoiceNumber} 
                   onChange={(e) => { setInvoiceNumber(e.target.value); setError(null); }} 
-                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:border-primary focus:bg-white dark:focus:bg-slate-900 transition-all outline-none text-sm font-black text-slate-900 dark:text-slate-100" 
+                  className={`w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border ${touchedInvoiceNumber && !invoiceNumber.trim() ? 'border-rose-500 ring-2 ring-rose-500/20' : 'border-slate-200 dark:border-slate-700'} rounded-xl focus:border-blue-600 focus:bg-white dark:focus:bg-slate-900 transition-all outline-none text-sm font-black text-slate-900 dark:text-slate-100`} 
                   placeholder="EST-0000" 
                 />
               </div>
@@ -419,11 +471,32 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCanc
               </div>
             </div>
 
-            <div className="pt-8 flex flex-col items-end border-t border-slate-100 dark:border-slate-800">
-               <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Estimated Total</div>
-               <div className="text-4xl font-black text-slate-900 dark:text-slate-100 flex items-center tracking-tighter">
-                 <span className="text-slate-400 font-bold text-lg mr-2">{CURRENCY_SYMBOL}</span>
-                 {Number(totals.grandTotal || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+            <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-slate-100 dark:border-slate-800">
+               <div>
+                  <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Estimated Total</div>
+                  <div className="text-4xl font-black text-slate-900 dark:text-slate-100 flex items-center tracking-tighter">
+                    <span className="text-slate-400 font-bold text-lg mr-2">{CURRENCY_SYMBOL}</span>
+                    {Number(totals.grandTotal || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                  </div>
+               </div>
+
+               <div className="flex items-center gap-3 w-full sm:w-auto">
+                 <button 
+                   type="button"
+                   onClick={onCancel} 
+                   className="flex-1 sm:flex-none px-6 py-3 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-bold text-xs uppercase tracking-wider hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
+                 >
+                   Cancel
+                 </button>
+                 <button 
+                   type="button"
+                   onClick={(e) => handleSave(e)}
+                   disabled={saving}
+                   className="flex-1 sm:flex-none flex items-center justify-center gap-2 text-white px-8 py-3 rounded-xl font-black text-xs uppercase tracking-wider bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-600/25 transition-all disabled:opacity-50"
+                 >
+                   {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+                   <span>{saving ? 'Saving...' : 'Save Estimate'}</span>
+                 </button>
                </div>
             </div>
           </div>

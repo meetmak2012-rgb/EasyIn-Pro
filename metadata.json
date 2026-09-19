@@ -1,5 +1,8 @@
 {
   "name": "EasyIn - Professional Invoicing",
-  "description": "A robust local invoicing solution with Sales, Purchase, and comprehensive Reports for small businesses.",
-  "requestFramePermissions": []
+  "description": "A cloud and local invoicing solution with Sales, Purchase, and comprehensive Reports for businesses.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }
